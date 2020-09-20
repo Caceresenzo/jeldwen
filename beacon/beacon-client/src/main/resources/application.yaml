@@ -1,0 +1,23 @@
+spring:
+  resources:
+    static-locations: file:src/main/resources/static
+  thymeleaf:
+    cache: false
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jeldwenx?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password: password
+  jpa:
+     database: MYSQL
+     hibernate:
+        ddl-auto: update
+     show-sql: false
+     properties:
+        hibernate:
+           dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+           globally_quoted_identifiers: true
+server:
+    uri: wss://echo.websocket.org
+storage:
+    last-config: last_config.json
