@@ -18,6 +18,7 @@ spring:
            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
            globally_quoted_identifiers: true
 server:
-    uri: wss://echo.websocket.org
+    #uri: wss://echo.websocket.org
+    uri: ws://localhost:5600
 storage:
     last-config: last_config.json

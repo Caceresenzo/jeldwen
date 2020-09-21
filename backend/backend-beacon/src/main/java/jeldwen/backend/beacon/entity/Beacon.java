@@ -10,12 +10,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "beacons")
+@Table(name = "beacons", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "unique")
+})
 @Data
 @Accessors(chain = true)
 public class Beacon {
@@ -23,6 +26,9 @@ public class Beacon {
 	@Id
 	@GeneratedValue
 	private long id;
+	
+	@Column(nullable = false)
+	private String unique;
 	
 	@Column
 	private String name;
@@ -40,9 +46,6 @@ public class Beacon {
 	private List<ProductFamily> productFamilies;
 	
 	@Column
-	private boolean maintenance;
-
-	@Column
-	private double syntheticPerformanceRate;
+	private double syntheticPerformanceRateThreshold;
 	
 }

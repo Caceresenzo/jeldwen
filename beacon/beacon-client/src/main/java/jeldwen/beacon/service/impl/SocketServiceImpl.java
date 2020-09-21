@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 
 import jeldwen.beacon.client.BeaconSocketClient;
 import jeldwen.beacon.message.model.IBeaconMessage;
-import jeldwen.beacon.message.model.config.BeaconConfig;
-import jeldwen.beacon.message.model.response.impl.auth.AuthResponseMessage;
+import jeldwen.beacon.message.model.request.impl.auth.AuthRequestMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
+import jeldwen.beacon.service.IConfigService;
 import jeldwen.beacon.service.ISocketService;
 import lombok.SneakyThrows;
 
@@ -23,6 +23,9 @@ public class SocketServiceImpl implements ISocketService, DisposableBean {
 	
 	@Autowired
 	private IBeaconMessageService beaconMessageService;
+	
+	@Autowired
+	private IConfigService configService;
 	
 	@Value("${server.uri}")
 	private String serverUri;
@@ -44,8 +47,7 @@ public class SocketServiceImpl implements ISocketService, DisposableBean {
 	
 	@SneakyThrows
 	public void authenticate() {
-//		send(new AuthRequestMessage());
-		send(new AuthResponseMessage().setConfig(new BeaconConfig()));
+		send(new AuthRequestMessage().setUnique(configService.getUnique()));
 	}
 	
 	@SneakyThrows
@@ -53,6 +55,7 @@ public class SocketServiceImpl implements ISocketService, DisposableBean {
 		beaconMessageService.parseAndDispatch(message);
 	}
 	
+	@Override
 	@SneakyThrows
 	public void send(IBeaconMessage message) {
 		beaconSocketClient.send(beaconMessageService.stringify(message));
@@ -62,7 +65,9 @@ public class SocketServiceImpl implements ISocketService, DisposableBean {
 	public void destroy() throws Exception {
 		finishing = true;
 		
-		beaconSocketClient.closeBlocking();
+		if (beaconSocketClient != null && beaconSocketClient.isOpen() && !beaconSocketClient.isClosed()) {
+			beaconSocketClient.closeBlocking();
+		}
 	}
 	
 	@Scheduled(fixedRate = 10000)

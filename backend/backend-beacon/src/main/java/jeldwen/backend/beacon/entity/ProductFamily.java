@@ -6,15 +6,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "product_families", uniqueConstraints = {
-		@UniqueConstraint(columnNames = "key")
-})
+@Table(name = "product_families")
 @Embeddable
 @Data
 @Accessors(chain = true)
@@ -23,9 +20,6 @@ public class ProductFamily {
 	@Id
 	@GeneratedValue
 	private long id;
-	
-	@Column
-	private String key;
 	
 	@Column
 	private String name;

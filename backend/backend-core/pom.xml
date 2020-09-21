@@ -6,6 +6,13 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>backend-core</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>jeldwen</groupId>
+			<artifactId>backend-beacon</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>

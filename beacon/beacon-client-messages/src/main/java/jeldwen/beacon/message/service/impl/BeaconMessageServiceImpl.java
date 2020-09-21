@@ -15,8 +15,10 @@ import jeldwen.beacon.message.model.IBeaconMessage;
 import jeldwen.beacon.message.model.MessageType;
 import jeldwen.beacon.message.model.request.BaseRequestMessage;
 import jeldwen.beacon.message.model.request.impl.auth.AuthRequestMessage;
+import jeldwen.beacon.message.model.request.impl.config.ConfigRequestMessage;
 import jeldwen.beacon.message.model.response.BaseResponseMessage;
 import jeldwen.beacon.message.model.response.impl.auth.AuthResponseMessage;
+import jeldwen.beacon.message.model.response.impl.config.ConfigResponseMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 
 @Service
@@ -41,12 +43,17 @@ public class BeaconMessageServiceImpl implements IBeaconMessageService {
 	@PostConstruct
 	private void initialize() {
 		requestClasses.put(AuthRequestMessage.NAME, AuthRequestMessage.class);
+		requestClasses.put(ConfigRequestMessage.NAME, ConfigRequestMessage.class);
+		
 		responseClasses.put(AuthResponseMessage.NAME, AuthResponseMessage.class);
+		responseClasses.put(ConfigResponseMessage.NAME, ConfigResponseMessage.class);
 	}
 	
 	@Override
 	public IBeaconMessage parse(String json) throws Exception {
 		Map<String, Object> map = objectMapper.readValue(json, TYPE_MAP_STRING_OBJECT);
+		
+		// System.err.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(map));
 		
 		String name = String.valueOf(map.get(JSON_KEY_NAME));
 		MessageType type = MessageType.valueOf(String.valueOf(map.get(JSON_KEY_TYPE)));

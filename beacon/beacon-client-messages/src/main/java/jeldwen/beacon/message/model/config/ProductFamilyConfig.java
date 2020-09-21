@@ -5,10 +5,10 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class StopReasonCategoryConfig {
+public class ProductFamilyConfig {
 	
 	private long id;
 	private String name;
-	private String color;
+	private long cycleTime;
 	
 }

@@ -1,5 +1,6 @@
 package jeldwen.backend.beacon.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,60 +44,49 @@ public class TestController {
 	
 	@GetMapping
 	public ResponseEntity<?> newBeacon() {
-		beaconRepository.deleteAll();
-		stopReasonGroupRepository.deleteAll();
-		stopReasonRepository.deleteAll();
-		stopReasonCategoryRepository.deleteAll();
-		productFamilyRepository.deleteAll();
+		cleanup();
 		
-		StopReasonCategory planifiedStopCategory = stopReasonCategoryRepository.save(new StopReasonCategory().setName("Arrêts planifiés").setColor("#EEC978"));
-		StopReasonCategory provideFaultCategory = stopReasonCategoryRepository.save(new StopReasonCategory().setName("Défaut alimentation de la ligne").setColor("#E4A16C"));
-		StopReasonCategory ligneStopCategory = stopReasonCategoryRepository.save(new StopReasonCategory().setName("Arrêt ligne").setColor("#FDBBAF"));
-		StopReasonCategory serieChangeCategory = stopReasonCategoryRepository.save(new StopReasonCategory().setName("Changement de série").setColor("#8EB98C"));
-		StopReasonCategory faultCategory = stopReasonCategoryRepository.save(new StopReasonCategory().setName("Panne").setColor("#7ECCD6"));
+		List<StopReason> reasons = new ArrayList<>();
 		
-		List<StopReason> reasons = Arrays.asList(
-				stopReasonRepository.save(new StopReason().setName("Top 5/Réunion").setCategory(planifiedStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Formation").setCategory(planifiedStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Pause").setCategory(planifiedStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Nettoyage").setCategory(planifiedStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Manque Porte").setCategory(provideFaultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Manque Huis").setCategory(provideFaultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Erreur Prépa").setCategory(provideFaultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Attente Mat.").setCategory(provideFaultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Porte NC").setCategory(provideFaultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Huis NC").setCategory(provideFaultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Erreur op.").setCategory(ligneStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Evacuation").setCategory(ligneStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Attente op.").setCategory(ligneStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Pb film plastiq.").setCategory(ligneStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("PB cassé").setCategory(ligneStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("Attente four").setCategory(ligneStopCategory)),
-				stopReasonRepository.save(new StopReason().setName("MEP").setCategory(serieChangeCategory)),
-				stopReasonRepository.save(new StopReason().setName("Réglages").setCategory(serieChangeCategory)),
-				stopReasonRepository.save(new StopReason().setName("Prépa bloc").setCategory(serieChangeCategory)),
-				stopReasonRepository.save(new StopReason().setName("Prépa écharp.").setCategory(serieChangeCategory)),
-				stopReasonRepository.save(new StopReason().setName("Prépa emb.").setCategory(serieChangeCategory)),
-				stopReasonRepository.save(new StopReason().setName("Chamgm film").setCategory(serieChangeCategory)),
-				stopReasonRepository.save(new StopReason().setName("Déplieur").setCategory(faultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Cadrage").setCategory(faultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Emballeuse").setCategory(faultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Four").setCategory(faultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Empileur").setCategory(faultCategory)),
-				stopReasonRepository.save(new StopReason().setName("Transferts").setCategory(faultCategory)));
+		createCategoryAndAttachReasons(reasons, "Arrêts planifiés", "#EEC978", "Top 5/Réunion", "Formation", "Pause", "Nettoyage");
+		createCategoryAndAttachReasons(reasons, "Défaut alimentation de la ligne", "#FDBBAF", "Manque Porte", "Manque Huis", "Erreur Prépa", "Attente Mat.", "Porte NC", "Huis NC");
+		createCategoryAndAttachReasons(reasons, "Arrêt ligne", "#FDBBAF", "Erreur op.", "Evacuation", "Attente op.", "Pb film plastiq.", "PB cassé", "Attente four");
+		createCategoryAndAttachReasons(reasons, "Changement de série", "#8EB98C", "MEP", "Réglages", "Prépa bloc", "Prépa écharp.", "Prépa emb.", "Chamgm film");
+		createCategoryAndAttachReasons(reasons, "Panne", "#7ECCD6", "Déplieur", "Cadrage", "Emballeuse", "Four", "Empileur", "Transferts");
 		
-		ProductFamily family1 = productFamilyRepository.save(new ProductFamily().setName("grass").setCycleTime(10).setKey("xxx"));
-		ProductFamily family2 = productFamilyRepository.save(new ProductFamily().setName("dirt").setCycleTime(15).setKey("yyy"));
-		ProductFamily family3 = productFamilyRepository.save(new ProductFamily().setName("stone").setCycleTime(25).setKey("zzz"));
-		ProductFamily family4 = productFamilyRepository.save(new ProductFamily().setName("mud").setCycleTime(60).setKey("aaa"));
+		List<StopReason> other = new ArrayList<>();
+		createCategoryAndAttachReasons(reasons, "Specialized", "#FFFFFF", "A", "B", "C");
+		
+		List<ProductFamily> families = Arrays.asList(productFamilyRepository.save(new ProductFamily().setName("grass").setCycleTime(10)),
+				productFamilyRepository.save(new ProductFamily().setName("dirt").setCycleTime(15)),
+				productFamilyRepository.save(new ProductFamily().setName("stone").setCycleTime(25)),
+				productFamilyRepository.save(new ProductFamily().setName("mud").setCycleTime(60)));
 		
 		StopReasonGroup group = stopReasonGroupRepository.save(new StopReasonGroup().setName("the group")
 				.setChildren(reasons));
 		
 		return new ApiAnwser<>(beaconRepository.save(new Beacon()
-				.setName("test2")
-				.setProductFamilies(Arrays.asList(family1, family2, family3, family4))
+				.setName("Plieuse")
+				.setUnique("80-FA-5B-80-EE-46")
+				.setProductFamilies(families)
+				.setStopReasons(other)
 				.setStopReasonGroups(Arrays.asList(group)))).toResponseEntity();
+	}
+	
+	private void cleanup() {
+		beaconRepository.deleteAll();
+		stopReasonGroupRepository.deleteAll();
+		stopReasonRepository.deleteAll();
+		stopReasonCategoryRepository.deleteAll();
+		productFamilyRepository.deleteAll();
+	}
+	
+	private void createCategoryAndAttachReasons(List<StopReason> out, String name, String color, String... reasons) {
+		StopReasonCategory category = stopReasonCategoryRepository.save(new StopReasonCategory().setName(name).setColor(color));
+		
+		for (String reason : reasons) {
+			out.add(stopReasonRepository.save(new StopReason().setName(reason).setCategory(category)));
+		}
 	}
 	
 }

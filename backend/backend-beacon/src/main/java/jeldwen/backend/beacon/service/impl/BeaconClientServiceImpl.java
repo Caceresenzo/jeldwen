@@ -1,98 +1,143 @@
 package jeldwen.backend.beacon.service.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
+import org.java_websocket.WebSocket;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jeldwen.backend.beacon.dto.DetectorUpdateBody;
-import jeldwen.backend.beacon.entity.Detector;
-import jeldwen.backend.beacon.repository.BeaconRepository;
-import jeldwen.backend.beacon.repository.DetectorRepository;
+import jeldwen.backend.beacon.server.BeaconSocketServer;
 import jeldwen.backend.beacon.service.IBeaconClientService;
+import jeldwen.backend.beacon.service.IBeaconService;
 import jeldwen.beacon.message.model.IBeaconMessage;
+import jeldwen.beacon.message.model.config.BeaconConfig;
 import jeldwen.beacon.message.model.request.impl.auth.AuthRequestMessage;
+import jeldwen.beacon.message.model.request.impl.config.ConfigRequestMessage;
+import jeldwen.beacon.message.model.response.impl.auth.AuthResponseMessage;
+import jeldwen.beacon.message.model.response.impl.config.ConfigResponseMessage;
+import jeldwen.beacon.message.service.IBeaconMessageService;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
-public class BeaconClientServiceImpl implements IBeaconClientService {
+@Slf4j
+public class BeaconClientServiceImpl implements IBeaconClientService, DisposableBean {
 	
 	@Autowired
-	private BeaconRepository beaconRepository;
+	private IBeaconMessageService beaconMessageService;
 	
 	@Autowired
-	private DetectorRepository beaconClientRepository;
-	
-	@Autowired
-	private ObjectMapper objectMapper;
+	private IBeaconService beaconService;
 	
 	/* Variables */
-	private Map<String, Class<? extends IBeaconMessage>> messageClasses;
+	private final Map<WebSocket, String> socketToUniqueMap;
+	private final Map<String, WebSocket> uniqueToSocketMap;
+	private BeaconSocketServer server;
 	
 	/* Constructor */
 	public BeaconClientServiceImpl() {
-		this.messageClasses = new HashMap<>();
+		this.socketToUniqueMap = new HashMap<>();
+		this.uniqueToSocketMap = new HashMap<>();
 	}
 	
 	@PostConstruct
 	private void initialize() {
-		messageClasses.put(AuthRequestMessage.NAME, AuthRequestMessage.class);
-	}
-	
-	@Override
-	public List<Detector> listAll() {
-		return beaconClientRepository.findAll();
-	}
-	
-	@Override
-	public Detector find(long id) {
-		return beaconClientRepository.findById(id).orElse(null);
-	}
-	
-	@Override
-	public Detector update(long id, DetectorUpdateBody body) {
-		Optional<Detector> optional = beaconClientRepository.findById(id);
+		server = new BeaconSocketServer(5600);
 		
-		if (optional.isPresent()) {
-			Detector beaconClient = optional.get();
+		server.start();
+		server.setOnMessage(this::parseAndDispatchMessage);
+		server.setOnClose(this::handleSocketDisconnect);
+	}
+	
+	@Override
+	public void destroy() throws Exception {
+		server.stop();
+	}
+	
+	@SneakyThrows
+	private void parseAndDispatchMessage(WebSocket webSocket, String message) {
+		IBeaconMessage beaconMessage = beaconMessageService.parse(message);
+		
+		if (beaconMessage instanceof AuthRequestMessage) {
+			onBeaconRequestAuthentication(webSocket, (AuthRequestMessage) beaconMessage);
+		} else if (beaconMessage instanceof ConfigRequestMessage) {
+			onBeaconRequestConfig(webSocket, (ConfigRequestMessage) beaconMessage);
+		}
+	}
+	
+	private void handleSocketConnect(WebSocket webSocket, String unique) {
+		socketToUniqueMap.put(webSocket, unique);
+		uniqueToSocketMap.put(unique, webSocket);
+		
+		log.info("Socket identified as `{}` connected.", unique);
+	}
+	
+	private void handleSocketDisconnect(WebSocket webSocket, String reason) {
+		String unique = socketToUniqueMap.remove(webSocket);
+		
+		if (unique != null) {
+			uniqueToSocketMap.remove(unique);
 			
-			return beaconClientRepository.save(beaconClient
-					.setName(body.getName())
-					.setBeacon(beaconRepository.findById(body.getBeacon()).orElse(null)));
+			log.info("Socket identified as `{}` disconnected. ({})", unique, reason);
+		}
+	}
+	
+	private boolean answer(WebSocket webSocket, IBeaconMessage message) {
+		try {
+			webSocket.send(beaconMessageService.stringify(message));
+			
+			return true;
+		} catch (Exception exception) {
+			throw new IllegalStateException("Cannot responde", exception);
+		}
+	}
+	
+	private boolean onBeaconRequestAuthentication(WebSocket webSocket, AuthRequestMessage message) {
+		String unique = message.getUnique();
+		
+		if (uniqueToSocketMap.containsKey(unique)) {
+			return answer(webSocket, new AuthResponseMessage().setReason(AuthResponseMessage.Reason.ALREADY_CONNECTED));
 		}
 		
-		return null;
+		try {
+			if (beaconService.create(unique)) {
+				log.info("Beacon identified as `{}` has been created.", unique);
+			}
+			
+			handleSocketConnect(webSocket, unique);
+			
+			return answer(webSocket, new AuthResponseMessage());
+		} catch (Exception exception) {
+			log.error("Failed to authenticate with unique: " + unique, exception);
+			
+			return answer(webSocket, new AuthResponseMessage().setReason(AuthResponseMessage.Reason.SERVER_EXCEPTION));
+		}
 	}
 	
-	@Override
-	public IBeaconMessage parseMessage(String json) throws Exception {
-		Map<String, Object> map = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {
-		});
+	private boolean onBeaconRequestConfig(WebSocket webSocket, ConfigRequestMessage message) {
+		String unique = socketToUniqueMap.get(webSocket);
 		
-		return objectMapper.convertValue(map, messageClasses.getOrDefault(map.get("name"), AuthRequestMessage.class));
-	}
-	
-	@Override
-	public String stringifyMessage(IBeaconMessage message) throws Exception {
-		return objectMapper.writeValueAsString(message);
-	}
-	
-	@Override
-	public Detector createIfNotExistsClient(AuthRequestMessage message) {
-		Detector beaconClient = beaconClientRepository.findByUnique(message.getUnique()).orElse(null);
-		
-		if (beaconClient == null) {
-			beaconClient = new Detector().setUnique(message.getUnique());
+		if (unique != null) {
+			try {
+				BeaconConfig beaconConfig = beaconService.getConfig(unique);
+				
+				if (beaconConfig == null) {
+					return answer(webSocket, new ConfigResponseMessage().setReason(ConfigResponseMessage.Reason.NOT_CONFIGURED));
+				}
+				
+				return answer(webSocket, new ConfigResponseMessage().setBeacon(beaconConfig));
+			} catch (Exception exception) {
+				log.error("Failed to anwser config with unique: " + unique, exception);
+				
+				return answer(webSocket, new ConfigResponseMessage().setReason(ConfigResponseMessage.Reason.SERVER_EXCEPTION));
+			}
 		}
 		
-		return beaconClientRepository.save(beaconClient.incrementConnectCount());
+		return answer(webSocket, new ConfigResponseMessage().setReason(ConfigResponseMessage.Reason.NOT_AUTHENTICATED));
 	}
 	
 }

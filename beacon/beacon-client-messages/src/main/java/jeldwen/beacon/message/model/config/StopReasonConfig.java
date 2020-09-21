@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class StopReasonConfig {
 	
-	private String key;
+	private long id;
 	private String name;
-	private String categoryKey;
+	private long categoryId;
 	
 }

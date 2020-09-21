@@ -1,6 +1,9 @@
 package jeldwen.beacon.service.impl;
 
 import java.io.File;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,23 @@ public class ConfigServiceImpl implements IConfigService {
 	
 	public File lastConfigFile() {
 		return new File(lastConfigFilePath);
+	}
+	
+	@Override
+	public String getUnique() throws SocketException {
+		Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+		while (networkInterfaces.hasMoreElements()) {
+			NetworkInterface ni = networkInterfaces.nextElement();
+			byte[] hardwareAddress = ni.getHardwareAddress();
+			if (hardwareAddress != null) {
+				String[] hexadecimalFormat = new String[hardwareAddress.length];
+				for (int i = 0; i < hardwareAddress.length; i++) {
+					hexadecimalFormat[i] = String.format("%02X", hardwareAddress[i]);
+				}
+				return String.join("-", hexadecimalFormat);
+			}
+		}
+		return null;
 	}
 	
 }

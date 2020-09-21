@@ -1,7 +1,8 @@
-package jeldwen.beacon.message.model.response.impl.auth;
+package jeldwen.beacon.message.model.response.impl.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jeldwen.beacon.message.model.config.BeaconConfig;
 import jeldwen.beacon.message.model.response.BaseResponseMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,16 +11,18 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class AuthResponseMessage extends BaseResponseMessage {
+public class ConfigResponseMessage extends BaseResponseMessage {
 	
 	/* Constants */
-	public static final String NAME = "auth";
+	public static final String NAME = "config";
 	
 	/* Variables */
+	private BeaconConfig beacon;
+	private boolean forced;
 	private Reason reason;
 	
 	/* Constructor */
-	public AuthResponseMessage() {
+	public ConfigResponseMessage() {
 		setName(NAME);
 	}
 	
@@ -30,8 +33,8 @@ public class AuthResponseMessage extends BaseResponseMessage {
 	
 	public enum Reason {
 		
-		ALREADY_CONNECTED, SERVER_EXCEPTION;
-	
+		NOT_AUTHENTICATED, NOT_CONFIGURED, SERVER_EXCEPTION;
+		
 	}
 	
 }
