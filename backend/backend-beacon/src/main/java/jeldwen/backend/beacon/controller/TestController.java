@@ -3,6 +3,7 @@ package jeldwen.backend.beacon.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -42,7 +43,7 @@ public class TestController {
 	@Autowired
 	private ProductFamilyRepository productFamilyRepository;
 	
-	@GetMapping
+	@GetMapping("new")
 	public ResponseEntity<?> newBeacon() {
 		cleanup();
 		
@@ -62,8 +63,12 @@ public class TestController {
 				productFamilyRepository.save(new ProductFamily().setName("stone").setCycleTime(25)),
 				productFamilyRepository.save(new ProductFamily().setName("mud").setCycleTime(60)));
 		
-		StopReasonGroup group = stopReasonGroupRepository.save(new StopReasonGroup().setName("the group")
-				.setChildren(reasons));
+		StopReasonGroup group = stopReasonGroupRepository.save(new StopReasonGroup()
+				.setName("the group")
+				.setChildren(reasons.stream()
+						.map(StopReason::attach)
+						.map(stopReasonRepository::save)
+						.collect(Collectors.toList())));
 		
 		return new ApiAnwser<>(beaconRepository.save(new Beacon()
 				.setName("Plieuse")
@@ -71,6 +76,13 @@ public class TestController {
 				.setProductFamilies(families)
 				.setStopReasons(other)
 				.setStopReasonGroups(Arrays.asList(group)))).toResponseEntity();
+	}
+	
+	@GetMapping("clear")
+	public ResponseEntity<?> clear() {
+		cleanup();
+		
+		return new ApiAnwser<>().toResponseEntity();
 	}
 	
 	private void cleanup() {

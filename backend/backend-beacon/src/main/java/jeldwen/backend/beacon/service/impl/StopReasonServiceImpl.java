@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import jeldwen.backend.beacon.entity.Beacon;
 import jeldwen.backend.beacon.entity.StopReason;
 import jeldwen.backend.beacon.entity.StopReasonGroup;
+import jeldwen.backend.beacon.model.descriptor.SimpleStopReasonDescriptor;
 import jeldwen.backend.beacon.repository.BeaconRepository;
 import jeldwen.backend.beacon.repository.StopReasonRepository;
 import jeldwen.backend.beacon.service.IStopReasonService;
+import jeldwen.backend.common.util.TypeAwareMapper;
 
 @Service
 public class StopReasonServiceImpl implements IStopReasonService {
@@ -23,9 +25,17 @@ public class StopReasonServiceImpl implements IStopReasonService {
 	@Autowired
 	private BeaconRepository beaconRepository;
 	
+	/* Mappers */
+	private final TypeAwareMapper<StopReason, SimpleStopReasonDescriptor> simpleStopReasonDescriptorMapper;
+	
+	public StopReasonServiceImpl() {
+		this.simpleStopReasonDescriptorMapper = new TypeAwareMapper<StopReason, SimpleStopReasonDescriptor>() {
+		};
+	}
+	
 	@Override
-	public List<StopReason> listAll() {
-		return stopReasonRepository.findAll();
+	public List<SimpleStopReasonDescriptor> listAll(boolean ignoreGroup) {
+		return simpleStopReasonDescriptorMapper.toDtos(ignoreGroup ? stopReasonRepository.findAll() : stopReasonRepository.findAllByAttachedIsFalse());
 	}
 	
 	@Override
@@ -48,6 +58,11 @@ public class StopReasonServiceImpl implements IStopReasonService {
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public List<StopReason> listAllByIds(List<Long> ids) {
+		return stopReasonRepository.findAllById(ids);
 	}
 	
 }

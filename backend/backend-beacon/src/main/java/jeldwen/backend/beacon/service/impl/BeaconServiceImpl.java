@@ -13,10 +13,16 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jeldwen.backend.beacon.dto.BeaconUpdateBody;
 import jeldwen.backend.beacon.entity.Beacon;
 import jeldwen.backend.beacon.entity.StopReasonCategory;
+import jeldwen.backend.beacon.model.descriptor.SimpleBeaconDescriptor;
 import jeldwen.backend.beacon.repository.BeaconRepository;
 import jeldwen.backend.beacon.service.IBeaconService;
+import jeldwen.backend.beacon.service.IProductFamilyService;
+import jeldwen.backend.beacon.service.IStopReasonGroupService;
+import jeldwen.backend.beacon.service.IStopReasonService;
+import jeldwen.backend.common.util.TypeAwareMapper;
 import jeldwen.beacon.message.model.config.BeaconConfig;
 import jeldwen.beacon.message.model.config.ProductFamilyConfig;
 import jeldwen.beacon.message.model.config.StopReasonCategoryConfig;
@@ -28,9 +34,26 @@ public class BeaconServiceImpl implements IBeaconService {
 	@Autowired
 	private BeaconRepository beaconRepository;
 	
+	@Autowired
+	private IProductFamilyService productFamilyService;
+	
+	@Autowired
+	private IStopReasonGroupService stopReasonGroupService;
+	
+	@Autowired
+	private IStopReasonService stopReasonService;
+	
+	/* Mappers */
+	private final TypeAwareMapper<Beacon, SimpleBeaconDescriptor> simpleBeaconDescriptorMapper;
+	
+	public BeaconServiceImpl() {
+		this.simpleBeaconDescriptorMapper = new TypeAwareMapper<Beacon, SimpleBeaconDescriptor>() {
+		};
+	}
+	
 	@Override
-	public List<Beacon> listAll() {
-		return beaconRepository.findAll();
+	public List<SimpleBeaconDescriptor> listAll() {
+		return simpleBeaconDescriptorMapper.toDtos(beaconRepository.findAll());
 	}
 	
 	@Override
@@ -45,6 +68,25 @@ public class BeaconServiceImpl implements IBeaconService {
 		}
 		
 		return beaconRepository.save(new Beacon().setUnique(unique)) != null;
+	}
+	
+	@Override
+	public Beacon update(long id, BeaconUpdateBody body) {
+		Optional<Beacon> optional = beaconRepository.findById(id);
+		
+		if (optional.isPresent()) {
+			Beacon beacon = optional.get();
+			
+			beacon
+					.setName(body.getName())
+					.setProductFamilies(productFamilyService.listAllByIds(body.getProductFamilyIds()))
+					.setStopReasonGroups(stopReasonGroupService.listAllByIds(body.getStopReasonGroupIds()))
+					.setStopReasons(stopReasonService.listAllByIds(body.getStopReasonIds()))
+					.setSyntheticPerformanceRateThreshold(body.getSyntheticPerformanceRateThreshold());
+			
+			return beaconRepository.save(beacon);
+		}
+		return null;
 	}
 	
 	@Transactional
@@ -83,7 +125,7 @@ public class BeaconServiceImpl implements IBeaconService {
 							.map((category) -> new StopReasonCategoryConfig()
 									.setId(category.getId())
 									.setName(category.getName())
-									.setColor(category.getName()))
+									.setColor(category.getColor()))
 							.collect(Collectors.toList()))
 					.setProductFamilies(beacon.getProductFamilies()
 							.stream()

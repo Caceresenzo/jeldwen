@@ -10,6 +10,8 @@ public interface IConfigService {
 	
 	BeaconConfig load() throws Exception;
 	
+	BeaconConfig current();
+	
 	String getUnique() throws SocketException;
 	
 }

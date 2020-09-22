@@ -12,9 +12,9 @@ public interface IBeaconMessageService {
 	
 	String stringify(IBeaconMessage message) throws Exception;
 	
-	void parseAndDispatch(String json) throws Exception;
+	IBeaconMessage parseAndDispatch(String json) throws Exception;
 	
-	void dispatch(IBeaconMessage message);
+	IBeaconMessage dispatch(IBeaconMessage message);
 	
 	void register(Object object);
 	

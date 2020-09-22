@@ -23,5 +23,6 @@
 	<modules>
 		<module>backend</module>
 		<module>beacon</module>
+		<module>frontend</module>
 	</modules>
 </project>

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import jeldwen.beacon.client.BeaconSocketClient;
 import jeldwen.beacon.message.model.IBeaconMessage;
-import jeldwen.beacon.message.model.request.impl.auth.AuthRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import jeldwen.beacon.service.IConfigService;
 import jeldwen.beacon.service.ISocketService;

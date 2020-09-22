@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jeldwen.backend.beacon.service.IStopReasonService;
@@ -18,8 +19,8 @@ public class StopReasonController {
 	private IStopReasonService stopReasonService;
 	
 	@GetMapping
-	public ResponseEntity<?> all() {
-		return new ApiAnwser<>(stopReasonService.listAll()).toResponseEntity();
+	public ResponseEntity<?> all(@RequestParam(required = false, defaultValue = "false") boolean ignoreGroup) {
+		return new ApiAnwser<>(stopReasonService.listAll(ignoreGroup)).toResponseEntity();
 	}
 	
 }

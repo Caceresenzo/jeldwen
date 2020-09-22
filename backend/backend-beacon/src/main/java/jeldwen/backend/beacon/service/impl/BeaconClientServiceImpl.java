@@ -1,6 +1,8 @@
 package jeldwen.backend.beacon.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -10,15 +12,17 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jeldwen.backend.beacon.server.BeaconSocketServer;
+import jeldwen.backend.beacon.server.ConsumableSocketServer;
 import jeldwen.backend.beacon.service.IBeaconClientService;
 import jeldwen.backend.beacon.service.IBeaconService;
 import jeldwen.beacon.message.model.IBeaconMessage;
 import jeldwen.beacon.message.model.config.BeaconConfig;
-import jeldwen.beacon.message.model.request.impl.auth.AuthRequestMessage;
-import jeldwen.beacon.message.model.request.impl.config.ConfigRequestMessage;
-import jeldwen.beacon.message.model.response.impl.auth.AuthResponseMessage;
-import jeldwen.beacon.message.model.response.impl.config.ConfigResponseMessage;
+import jeldwen.beacon.message.model.message.event.impl.connect.BeaconConnectedEventMessage;
+import jeldwen.beacon.message.model.message.event.impl.connect.BeaconDisconnectedEventMessage;
+import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.config.ConfigRequestMessage;
+import jeldwen.beacon.message.model.message.response.impl.auth.AuthResponseMessage;
+import jeldwen.beacon.message.model.message.response.impl.config.ConfigResponseMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class BeaconClientServiceImpl implements IBeaconClientService, DisposableBean {
+	
+	/* Constants */
+	private static final Object LOCK = new Object();
 	
 	@Autowired
 	private IBeaconMessageService beaconMessageService;
@@ -36,7 +43,7 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	/* Variables */
 	private final Map<WebSocket, String> socketToUniqueMap;
 	private final Map<String, WebSocket> uniqueToSocketMap;
-	private BeaconSocketServer server;
+	private ConsumableSocketServer server;
 	
 	/* Constructor */
 	public BeaconClientServiceImpl() {
@@ -46,7 +53,7 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	
 	@PostConstruct
 	private void initialize() {
-		server = new BeaconSocketServer(5600);
+		server = new ConsumableSocketServer(5600);
 		
 		server.start();
 		server.setOnMessage(this::parseAndDispatchMessage);
@@ -58,9 +65,16 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 		server.stop();
 	}
 	
+	@Override
+	public List<String> listConnectedUniques() {
+		synchronized (LOCK) {
+			return new ArrayList<>(socketToUniqueMap.values());
+		}
+	}
+	
 	@SneakyThrows
 	private void parseAndDispatchMessage(WebSocket webSocket, String message) {
-		IBeaconMessage beaconMessage = beaconMessageService.parse(message);
+		IBeaconMessage beaconMessage = beaconMessageService.parseAndDispatch(message);
 		
 		if (beaconMessage instanceof AuthRequestMessage) {
 			onBeaconRequestAuthentication(webSocket, (AuthRequestMessage) beaconMessage);
@@ -70,23 +84,35 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	}
 	
 	private void handleSocketConnect(WebSocket webSocket, String unique) {
-		socketToUniqueMap.put(webSocket, unique);
-		uniqueToSocketMap.put(unique, webSocket);
+		synchronized (LOCK) {
+			socketToUniqueMap.put(webSocket, unique);
+			uniqueToSocketMap.put(unique, webSocket);
+		}
 		
 		log.info("Socket identified as `{}` connected.", unique);
+		
+		beaconMessageService.dispatch(new BeaconConnectedEventMessage().setUnique(unique));
 	}
 	
 	private void handleSocketDisconnect(WebSocket webSocket, String reason) {
-		String unique = socketToUniqueMap.remove(webSocket);
+		String unique;
+		
+		synchronized (LOCK) {
+			unique = socketToUniqueMap.remove(webSocket);
+		}
 		
 		if (unique != null) {
-			uniqueToSocketMap.remove(unique);
+			synchronized (LOCK) {
+				uniqueToSocketMap.remove(unique);
+			}
 			
 			log.info("Socket identified as `{}` disconnected. ({})", unique, reason);
+			
+			beaconMessageService.dispatch(new BeaconDisconnectedEventMessage().setUnique(unique));
 		}
 	}
 	
-	private boolean answer(WebSocket webSocket, IBeaconMessage message) {
+	public boolean answer(WebSocket webSocket, IBeaconMessage message) {
 		try {
 			webSocket.send(beaconMessageService.stringify(message));
 			
@@ -129,7 +155,7 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 					return answer(webSocket, new ConfigResponseMessage().setReason(ConfigResponseMessage.Reason.NOT_CONFIGURED));
 				}
 				
-				return answer(webSocket, new ConfigResponseMessage().setBeacon(beaconConfig));
+				return answer(webSocket, new ConfigResponseMessage().setBeaconConfig(beaconConfig));
 			} catch (Exception exception) {
 				log.error("Failed to anwser config with unique: " + unique, exception);
 				

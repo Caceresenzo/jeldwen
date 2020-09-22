@@ -13,12 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jeldwen.beacon.message.model.IBeaconMessage;
 import jeldwen.beacon.message.model.MessageType;
-import jeldwen.beacon.message.model.request.BaseRequestMessage;
-import jeldwen.beacon.message.model.request.impl.auth.AuthRequestMessage;
-import jeldwen.beacon.message.model.request.impl.config.ConfigRequestMessage;
-import jeldwen.beacon.message.model.response.BaseResponseMessage;
-import jeldwen.beacon.message.model.response.impl.auth.AuthResponseMessage;
-import jeldwen.beacon.message.model.response.impl.config.ConfigResponseMessage;
+import jeldwen.beacon.message.model.message.request.BaseRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.config.ConfigRequestMessage;
+import jeldwen.beacon.message.model.message.response.BaseResponseMessage;
+import jeldwen.beacon.message.model.message.response.impl.auth.AuthResponseMessage;
+import jeldwen.beacon.message.model.message.response.impl.config.ConfigResponseMessage;
+import jeldwen.beacon.message.model.message.response.impl.list.ConnectedBeaconListResponseMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 
 @Service
@@ -47,6 +48,7 @@ public class BeaconMessageServiceImpl implements IBeaconMessageService {
 		
 		responseClasses.put(AuthResponseMessage.NAME, AuthResponseMessage.class);
 		responseClasses.put(ConfigResponseMessage.NAME, ConfigResponseMessage.class);
+		responseClasses.put(ConnectedBeaconListResponseMessage.NAME, ConnectedBeaconListResponseMessage.class);
 	}
 	
 	@Override
@@ -80,13 +82,15 @@ public class BeaconMessageServiceImpl implements IBeaconMessageService {
 	}
 	
 	@Override
-	public void parseAndDispatch(String json) throws Exception {
-		dispatch(parse(json));
+	public IBeaconMessage parseAndDispatch(String json) throws Exception {
+		return dispatch(parse(json));
 	}
 	
 	@Override
-	public void dispatch(IBeaconMessage message) {
+	public IBeaconMessage dispatch(IBeaconMessage message) {
 		EventBus.getDefault().post(message);
+		
+		return message;
 	}
 	
 	@Override

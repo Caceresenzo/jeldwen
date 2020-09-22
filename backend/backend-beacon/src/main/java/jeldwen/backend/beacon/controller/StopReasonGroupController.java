@@ -12,7 +12,7 @@ import jeldwen.backend.beacon.service.IStopReasonGroupService;
 import jeldwen.backend.common.model.api.impl.ApiAnwser;
 
 @RestController
-@RequestMapping(path = "/beacon/stop-reason-group", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/beacon/stop-reason/group", produces = MediaType.APPLICATION_JSON_VALUE)
 public class StopReasonGroupController {
 	
 	@Autowired

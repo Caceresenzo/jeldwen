@@ -12,9 +12,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "stop_reasons"/*, uniqueConstraints = {
-		@UniqueConstraint(columnNames = { "key" })
-}*/)
+@Table(name = "stop_reasons")
 @Embeddable
 @Data
 @Accessors(chain = true)
@@ -25,12 +23,16 @@ public class StopReason {
 	private long id;
 	
 	@Column
-	private String key;
-	
-	@Column
 	private String name;
 	
 	@ManyToOne
 	private StopReasonCategory category;
+	
+	@Column
+	private boolean attached;
+	
+	public StopReason attach() {
+		return setAttached(true);
+	}
 	
 }
