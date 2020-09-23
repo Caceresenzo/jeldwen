@@ -33,7 +33,7 @@
 					<v-divider></v-divider>
 					<v-list v-if="beacon" subheader>
 						<v-subheader>Stop Reason Groups</v-subheader>
-						<v-list-item v-for="stopReasonGroup of beacon.stopReasonGroups" :key="stopReasonGroup.id" @click>
+						<v-list-item v-for="stopReasonGroup of beacon.stopReasonGroups" :key="stopReasonGroup.id" @click="openStopReasonGroup(stopReasonGroup.id)">
 							<v-list-item-content>
 								<v-list-item-title v-text="stopReasonGroup.name" />
 								<v-list-item-subtitle v-text="stopReasonGroup.children.length + ' child(ren)'" />
@@ -112,9 +112,12 @@ export default {
 		},
 		edit() {
 			if (this.beacon) {
-				this.$router.push(`/beacon/${this.beacon.id}/edit`)
+				this.$router.push(`/beacon/${this.beacon.id}/edit`);
 			}
-		}
+		},
+		openStopReasonGroup(id) {
+			this.$router.push(`/beacon/stop-reason/group/${id}`);
+		},
 	},
 	created() {
 		this.refresh();

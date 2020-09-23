@@ -9,13 +9,28 @@
 							<v-text-field label="Name" v-model="inputs.name"></v-text-field>
 						</v-list-item>
 						<v-list-item>
-							<v-select label="Product Families" multiple v-model="inputs.productFamilyIds" :items="items.productFamilies" item-text="name" item-value="id" :disabled="subloading.productFamilyIds"></v-select>
+							<v-list-item-content>
+								<v-select label="Product Families" multiple v-model="inputs.productFamilyIds" :items="items.productFamilies" item-text="name" item-value="id" :disabled="subloading.productFamilyIds"></v-select>
+							</v-list-item-content>
+							<v-list-item-avatar>
+								<v-icon @click="openProductFamilyCreateDialog()">mdi-plus</v-icon>
+							</v-list-item-avatar>
 						</v-list-item>
 						<v-list-item>
-							<v-select label="Stop Reason Groups" multiple v-model="inputs.stopReasonGroupIds" :items="items.stopReasonGroups" item-text="name" item-value="id" :disabled="subloading.stopReasonGroupIds"></v-select>
+							<v-list-item-content>
+								<v-select label="Stop Reason Groups" multiple v-model="inputs.stopReasonGroupIds" :items="items.stopReasonGroups" item-text="name" item-value="id" :disabled="subloading.stopReasonGroupIds"></v-select>
+							</v-list-item-content>
+							<v-list-item-avatar>
+								<v-icon @click="openStopReasonGroupCreateModal()">mdi-plus</v-icon>
+							</v-list-item-avatar>
 						</v-list-item>
 						<v-list-item>
-							<v-select label="Stop Reasons" multiple v-model="inputs.stopReasonIds" :items="items.stopReasons" item-text="name" item-value="id" :disabled="subloading.stopReasonIds"></v-select>
+							<v-list-item-content>
+								<v-select label="Stop Reasons" multiple v-model="inputs.stopReasonIds" :items="items.stopReasons" item-text="name" item-value="id" :disabled="subloading.stopReasonIds"></v-select>
+							</v-list-item-content>
+							<v-list-item-avatar>
+								<v-icon @click="openStopReasonCreateModal()">mdi-plus</v-icon>
+							</v-list-item-avatar>
 						</v-list-item>
 						<v-list-item>
 							<v-input label="Synthetic Performance Rate Threshold" value="qs">
@@ -43,15 +58,24 @@
 				<v-alert v-else type="error">Failed to update.</v-alert>
 			</v-col>
 		</v-row>
+		<product-family-create-modal @created="(family) => justCreated(family, items.productFamilies, inputs.productFamilyIds)"  ref="productFamilyCreateModal" />
+		<stop-reason-group-create-modal @created="(stopReasonGroup) => justCreated(stopReasonGroup, items.stopReasonGroups, inputs.stopReasonGroupIds)" ref="stopReasonGroupCreateModal" />
+		<stop-reason-create-modal @created="(stopReason) => justCreated(stopReason, items.stopReasons, inputs.stopReasonIds)" ref="stopReasonCreateModal" />
 	</v-container>
 </template>
 
 <script>
 import BeaconConnectedState from "./components/BeaconConnectedState";
+import StopReasonCreateModal from "./modals/StopReasonCreateModal";
+import StopReasonGroupCreateModal from "./modals/StopReasonGroupCreateModal";
+import ProductFamilyCreateModal from "./modals/ProductFamilyCreateModal";
 
 export default {
 	components: {
 		BeaconConnectedState,
+		StopReasonGroupCreateModal,
+		StopReasonCreateModal,
+		ProductFamilyCreateModal,
 	},
 	data() {
 		return {
@@ -171,6 +195,27 @@ export default {
 		cancel() {
 			this.$router.push(`/beacon/${this.$route.params.id}`);
 		},
+		openProductFamilyCreateDialog() {
+			if (this.beacon) {
+				this.$refs.productFamilyCreateModal.open(this.beacon.id);
+			}
+		},
+		openStopReasonGroupCreateModal() {
+			if (this.beacon) {
+				this.$refs.stopReasonGroupCreateModal.open();
+			}
+		},
+		openStopReasonCreateModal() {
+			if (this.beacon) {
+				this.$refs.stopReasonCreateModal.open();
+			}
+		},
+		justCreated(object, addToItems, addToIds) {
+			console.log(object)
+
+			addToItems.push(object);
+			addToIds.push(object.id);
+		}
 	},
 	created() {
 		this.refresh();

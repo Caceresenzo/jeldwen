@@ -62,6 +62,11 @@ public class BeaconServiceImpl implements IBeaconService {
 	}
 	
 	@Override
+	public List<Beacon> listAllByIds(List<Long> ids) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public boolean create(String unique) {
 		if (beaconRepository.existsByUnique(unique)) {
 			return false;
@@ -138,6 +143,11 @@ public class BeaconServiceImpl implements IBeaconService {
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public Beacon create(BeaconUpdateBody body) {
+		throw new UnsupportedOperationException();
 	}
 	
 }

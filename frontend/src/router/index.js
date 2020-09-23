@@ -23,6 +23,10 @@ const routes = [
 		path: '/beacon/:id/edit',
 		component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/BeaconEdit.vue')
 	},
+	{
+		path: '/beacon/stop-reason/group/:id',
+		component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/StopReasonGroupDetails.vue')
+	},
 	// {
 	// 	path: '/beacon',
 	// 	name: 'Beacon',

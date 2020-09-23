@@ -71,7 +71,7 @@ export default {
 		},
 	},
 	created() {
-		this.$vuetify.theme.dark = true;
+		// this.$vuetify.theme.dark = true;
 	},
 	mounted() {
 		this.$socket.start();

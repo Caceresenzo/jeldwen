@@ -1,10 +1,12 @@
 package jeldwen.backend.beacon.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jeldwen.backend.beacon.dto.ProductFamilyUpdateBody;
 import jeldwen.backend.beacon.entity.ProductFamily;
 import jeldwen.backend.beacon.model.descriptor.SimpleProductFamilyDescriptor;
 import jeldwen.backend.beacon.repository.ProductFamilyRepository;
@@ -38,6 +40,26 @@ public class ProductFamilyServiceImpl implements IProductFamilyService {
 	@Override
 	public List<ProductFamily> listAllByIds(List<Long> ids) {
 		return productFamilyRepository.findAllById(ids);
+	}
+	
+	@Override
+	public ProductFamily create(ProductFamilyUpdateBody body) {
+		return productFamilyRepository.save(new ProductFamily()
+				.setName(body.getName())
+				.setCycleTime(body.getCycleTime()));
+	}
+	
+	@Override
+	public ProductFamily update(long id, ProductFamilyUpdateBody body) {
+		Optional<ProductFamily> optional = productFamilyRepository.findById(id);
+		
+		if (optional.isPresent()) {
+			return productFamilyRepository.save(optional.get()
+					.setName(body.getName())
+					.setCycleTime(body.getCycleTime()));
+		}
+		
+		return null;
 	}
 	
 }
