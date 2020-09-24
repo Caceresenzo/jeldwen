@@ -82,15 +82,14 @@ public class BeaconServiceImpl implements IBeaconService {
 		if (optional.isPresent()) {
 			Beacon beacon = optional.get();
 			
-			beacon
+			return beaconRepository.save(beacon
 					.setName(body.getName())
 					.setProductFamilies(productFamilyService.listAllByIds(body.getProductFamilyIds()))
 					.setStopReasonGroups(stopReasonGroupService.listAllByIds(body.getStopReasonGroupIds()))
-					.setStopReasons(stopReasonService.listAllByIds(body.getStopReasonIds()))
-					.setSyntheticPerformanceRateThreshold(body.getSyntheticPerformanceRateThreshold());
-			
-			return beaconRepository.save(beacon);
+					.setStopReasons(stopReasonService.saveAsParent(stopReasonService.listAllByIds(body.getStopReasonIds()), beacon, IStopReasonService.CollisionResolution.IGNORE))
+					.setSyntheticPerformanceRateThreshold(body.getSyntheticPerformanceRateThreshold()));
 		}
+		
 		return null;
 	}
 	
@@ -147,6 +146,11 @@ public class BeaconServiceImpl implements IBeaconService {
 	
 	@Override
 	public Beacon create(BeaconUpdateBody body) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public Beacon delete(long id) {
 		throw new UnsupportedOperationException();
 	}
 	

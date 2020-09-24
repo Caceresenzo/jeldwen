@@ -14,4 +14,6 @@ public interface IModelBasedService<M, D, B> {
 	
 	M update(long id, B body);
 	
+	M delete(long id);
+	
 }

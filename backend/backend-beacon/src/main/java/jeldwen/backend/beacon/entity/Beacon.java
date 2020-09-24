@@ -1,17 +1,21 @@
 package jeldwen.backend.beacon.entity;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import jeldwen.backend.beacon.entity.interfaces.IStopReasonParent;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -21,7 +25,7 @@ import lombok.experimental.Accessors;
 })
 @Data
 @Accessors(chain = true)
-public class Beacon {
+public class Beacon implements IStopReasonParent {
 	
 	@Id
 	@GeneratedValue
@@ -37,9 +41,8 @@ public class Beacon {
 	@CollectionTable(joinColumns = @JoinColumn(name = "stop_reason_group_id"))
 	private List<StopReasonGroup> stopReasonGroups;
 	
-	@ElementCollection
-	@CollectionTable(joinColumns = @JoinColumn(name = "stop_reason_id"))
-	private List<StopReason> stopReasons;
+	@OneToMany(mappedBy = "beacon", fetch = FetchType.LAZY)
+	private Set<StopReason> stopReasons;
 	
 	@ElementCollection
 	@CollectionTable(joinColumns = @JoinColumn(name = "product_family_id"))
@@ -47,5 +50,10 @@ public class Beacon {
 	
 	@Column
 	private double syntheticPerformanceRateThreshold;
+	
+	@Override
+	public Set<StopReason> getStopReasonChildren() {
+		return stopReasons;
+	}
 	
 }

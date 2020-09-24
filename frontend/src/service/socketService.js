@@ -35,6 +35,8 @@ class SocketService extends EventEmitter {
 	onSocketClose() {
 		this.emit('onSocketClose');
 		console.log("onSocketClose")
+
+		setTimeout(() => this.connect(), 1000);
 	}
 
 	onSocketError(error) {

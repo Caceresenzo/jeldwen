@@ -1,7 +1,7 @@
 <template>
 	<loading-card :title="title" :endpoint="endpoint">
 		<template v-slot="{ payload }">
-			<v-list v-if="payload" two-line subheader>
+			<v-list v-if="payload">
 				<v-list-item v-for="item in payload" :key="item.id" :link="linkFormatter != null" :to="linkFormatter ? linkFormatter(item) : null">
 					<slot v-bind:item="item">{{ item }}</slot>
 				</v-list-item>

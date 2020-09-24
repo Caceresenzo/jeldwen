@@ -1,8 +1,9 @@
 package jeldwen.backend.beacon.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.cfg.NotYetImplementedException;
@@ -51,7 +52,7 @@ public class StopReasonGroupServiceImpl implements IStopReasonGroupService {
 	}
 	
 	@Override
-	public List<StopReason> listReasons(long groupId) {
+	public Collection<StopReason> listReasons(long groupId) {
 		Optional<StopReasonGroup> optional = stopReasonGroupRepository.findById(groupId);
 		
 		if (optional.isPresent()) {
@@ -68,17 +69,39 @@ public class StopReasonGroupServiceImpl implements IStopReasonGroupService {
 	
 	@Override
 	public StopReasonGroup create(StopReasonGroupUpdateBody body) {
-		return stopReasonGroupRepository.save(new StopReasonGroup()
+		Set<StopReason> children = stopReasonService.listAllByIds(body.getChildrenIds())
+				.stream()
+				.filter(StopReason::isFree)
+				.collect(Collectors.toSet());
+		
+		StopReasonGroup group = stopReasonGroupRepository.save(new StopReasonGroup()
 				.setName(body.getName())
-				.setChildren(stopReasonRepository.saveAll(stopReasonService.listAllByIds(body.getChildrenIds())
-						.stream()
-						.filter(((Predicate<StopReason>) StopReason::isAttached).negate())
-						.map(StopReason::attach)
-						.collect(Collectors.toList()))));
+				.setChildren(children));
+		
+		children.forEach((stopReason) -> stopReason.setGroup(group));
+		
+		stopReasonRepository.saveAll(children);
+		
+		return group;
 	}
 	
 	@Override
 	public StopReasonGroup update(long id, StopReasonGroupUpdateBody body) {
+		Optional<StopReasonGroup> optional = stopReasonGroupRepository.findById(id);
+		
+		if (optional.isPresent()) {
+			StopReasonGroup group = optional.get();
+			
+			return stopReasonGroupRepository.save(group
+					.setName(body.getName())
+					.setChildren(stopReasonService.saveAsParent(stopReasonService.listAllByIds(body.getChildrenIds()), group, IStopReasonService.CollisionResolution.IGNORE)));
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public StopReasonGroup delete(long id) {
 		throw new NotYetImplementedException();
 	}
 	

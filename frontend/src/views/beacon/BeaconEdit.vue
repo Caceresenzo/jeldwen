@@ -2,8 +2,13 @@
 	<v-container fluid>
 		<v-row>
 			<v-col cols="12">
+				<div v-if="updated !== null">
+					<v-alert v-if="updated" type="success">Updated.</v-alert>
+					<v-alert v-else type="error">Failed to update.</v-alert>
+				</div>
 				<v-card :loading="loading">
 					<v-card-title v-text="title"></v-card-title>
+					<v-divider></v-divider>
 					<v-list v-if="!loading">
 						<v-list-item>
 							<v-text-field label="Name" v-model="inputs.name"></v-text-field>
@@ -44,6 +49,7 @@
 							</v-input>
 						</v-list-item>
 					</v-list>
+					<v-divider></v-divider>
 					<v-card-actions>
 						<v-btn v-if="error" text color="error" :disabled="loading" v-text="error" @click="refresh()"></v-btn>
 						<v-spacer></v-spacer>
@@ -53,12 +59,27 @@
 					</v-card-actions>
 				</v-card>
 			</v-col>
-			<v-col v-if="updated !== null" cols="12">
-				<v-alert v-if="updated" type="success">Updated.</v-alert>
-				<v-alert v-else type="error">Failed to update.</v-alert>
+			<v-col cols="12">
+				<v-card class="red--text" :loading="loading">
+					<v-card-title>
+						<v-icon color="red" class="mr-2">mdi-lock</v-icon>
+						Danger Zone
+					</v-card-title>
+					<v-divider></v-divider>
+					<v-list v-if="!loading">
+						<v-list-item>
+							<v-list-item-content>
+								<v-list-title>Delete the beacon</v-list-title>
+							</v-list-item-content>
+							<v-list-icon>
+								<v-btn disabled color="error" depressed>DELETE</v-btn>
+							</v-list-icon>
+						</v-list-item>
+					</v-list>
+				</v-card>
 			</v-col>
 		</v-row>
-		<product-family-create-modal @created="(family) => justCreated(family, items.productFamilies, inputs.productFamilyIds)"  ref="productFamilyCreateModal" />
+		<product-family-create-modal @created="(family) => justCreated(family, items.productFamilies, inputs.productFamilyIds)" ref="productFamilyCreateModal" />
 		<stop-reason-group-create-modal @created="(stopReasonGroup) => justCreated(stopReasonGroup, items.stopReasonGroups, inputs.stopReasonGroupIds)" ref="stopReasonGroupCreateModal" />
 		<stop-reason-create-modal @created="(stopReason) => justCreated(stopReason, items.stopReasons, inputs.stopReasonIds)" ref="stopReasonCreateModal" />
 	</v-container>
@@ -103,6 +124,9 @@ export default {
 		};
 	},
 	computed: {
+		id() {
+			return this.$route.params.id;
+		},
 		title() {
 			return "Beacon: " + (this.beacon?.unique || "???");
 		},
@@ -134,7 +158,13 @@ export default {
 						this.error.productFamily = error;
 					}),
 				this.$http
-					.get("/beacon/stop-reason")
+					.get("/beacon/stop-reason", {
+						params: {
+							includeFree: true,
+							includeParent: "BEACON",
+							parentId: this.id,
+						},
+					})
 					.then((response) => {
 						this.items.stopReasons = response.data.payload;
 					})
@@ -211,11 +241,11 @@ export default {
 			}
 		},
 		justCreated(object, addToItems, addToIds) {
-			console.log(object)
+			console.log(object);
 
 			addToItems.push(object);
 			addToIds.push(object.id);
-		}
+		},
 	},
 	created() {
 		this.refresh();

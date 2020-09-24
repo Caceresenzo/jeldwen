@@ -1,5 +1,5 @@
 <template>
-	<creation-modal ref="modal" title="Stop Reason Creation" endpoint="/beacon/stop-reason/group" :payload="inputs" :on-open="resetInputs" @created="(object) => $emit('created', object)">
+	<creation-modal ref="stopReasonGroupCreateModalModal" :title="title" :edit="editId !== null" :endpoint="endpoint" :payload="inputs" :on-open="refresh" :on-close="resetInputs" @loaded="payloadToInputs" @created="(object) => $emit('created', object)" @updated="(object) => $emit('updated', object)">
 		<template v-slot="{ loading }">
 			<v-list>
 				<v-list-item>
@@ -43,21 +43,45 @@ export default {
 			name: null,
 			childrenIds: [],
 		},
+		editId: null,
 	}),
+	computed: {
+		title() {
+			return this.editId ? "Stop Reason Group Edition" : "Stop Reason Group Creation";
+		},
+		endpoint() {
+			return this.editId ? `/beacon/stop-reason/group/${this.editId}` : "/beacon/stop-reason/group/";
+		},
+	},
 	methods: {
+		payloadToInputs(payload) {
+			this.inputs = {
+				name: payload.name,
+				childrenIds: payload.children.map((stopReason) => stopReason.id),
+			};
+		},
 		open() {
-			this.$refs.modal.open();
+			this.$refs.stopReasonGroupCreateModalModal.open();
 		},
 		close() {
-			this.$refs.modal.close();
+			this.$refs.stopReasonGroupCreateModalModal.close();
+		},
+		edit(id) {
+			this.editId = id;
+
+			setTimeout(() => this.open(), 5);
 		},
 		refresh() {
-			console.log(this.inputs.categoryId);
-
 			this.dependencyLoading = true;
 
 			return this.$http
-				.get("/beacon/stop-reason")
+				.get("/beacon/stop-reason", {
+					params: {
+						includeFree: true,
+						includeParent: "GROUP",
+						parentId: this.editId,
+					},
+				})
 				.then((response) => {
 					this.items.stopReasons = response.data.payload;
 				})

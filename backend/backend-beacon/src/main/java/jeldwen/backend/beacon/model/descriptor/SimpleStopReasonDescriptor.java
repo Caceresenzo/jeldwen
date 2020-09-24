@@ -10,5 +10,6 @@ public class SimpleStopReasonDescriptor {
 	private long id;
 	private String name;
 	private long categoryId;
+	private Long parentId;
 	
 }

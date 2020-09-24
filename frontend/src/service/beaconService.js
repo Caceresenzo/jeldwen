@@ -18,12 +18,7 @@ class BeaconService extends EventEmitter {
 	}
 
 	onSocketMessage(message) {
-		console.log(this)
-		console.log(message)
-
 		let callback = this.dispatch[message.name];
-		
-		console.log(callback)
 
 		if (callback) {
 			callback(message);

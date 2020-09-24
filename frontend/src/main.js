@@ -20,6 +20,9 @@ Vue.component(LoadingCard.name, LoadingCard);
 import ListCard from './components/ListCard'
 Vue.component(ListCard.name, ListCard);
 
+import VuetifyDialogPromise from "vuetify-dialog-promise";
+Vue.use(VuetifyDialogPromise);
+
 new Vue({
 	router,
 	store,

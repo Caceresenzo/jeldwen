@@ -1,7 +1,9 @@
 <template>
 	<v-card :loading="loading">
 		<v-card-title v-if="title" v-text="title"></v-card-title>
+		<v-divider></v-divider>
 		<slot v-bind:payload="payload">{{ payload }}</slot>
+		<v-divider></v-divider>
 		<v-card-actions>
 			<v-btn v-if="error" text color="error" :disabled="loading" v-text="error" @click="refresh()"></v-btn>
 			<v-spacer></v-spacer>

@@ -1,16 +1,18 @@
 package jeldwen.backend.beacon.entity;
 
-import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jeldwen.backend.beacon.entity.interfaces.IStopReasonParent;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -18,7 +20,7 @@ import lombok.experimental.Accessors;
 @Table(name = "stop_reason_groups")
 @Data
 @Accessors(chain = true)
-public class StopReasonGroup {
+public class StopReasonGroup implements IStopReasonParent {
 	
 	@Id
 	@GeneratedValue
@@ -27,8 +29,17 @@ public class StopReasonGroup {
 	@Column
 	private String name;
 	
-	@ElementCollection
-	@CollectionTable(joinColumns = @JoinColumn(name = "stop_reason_id"))
-	private List<StopReason> children;
+	@OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+	private Set<StopReason> children;
+	
+	@JsonIgnore
+	public int getChildrenCount() {
+		return children != null ? children.size() : null;
+	}
+	
+	@Override
+	public Set<StopReason> getStopReasonChildren() {
+		return children;
+	}
 	
 }

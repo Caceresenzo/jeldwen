@@ -2,8 +2,10 @@ package jeldwen.backend.beacon.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -55,7 +57,7 @@ public class TestController {
 		createCategoryAndAttachReasons(reasons, "Changement de série", "#8EB98C", "MEP", "Réglages", "Prépa bloc", "Prépa écharp.", "Prépa emb.", "Chamgm film");
 		createCategoryAndAttachReasons(reasons, "Panne", "#7ECCD6", "Déplieur", "Cadrage", "Emballeuse", "Four", "Empileur", "Transferts");
 		
-		List<StopReason> other = new ArrayList<>();
+		Set<StopReason> other = new HashSet<>();
 		createCategoryAndAttachReasons(reasons, "Specialized", "#FFFFFF", "A", "B", "C");
 		
 		List<ProductFamily> families = Arrays.asList(productFamilyRepository.save(new ProductFamily().setName("grass").setCycleTime(10)),
@@ -65,10 +67,9 @@ public class TestController {
 		
 		StopReasonGroup group = stopReasonGroupRepository.save(new StopReasonGroup()
 				.setName("the group")
-				.setChildren(reasons.stream()
-						.map(StopReason::attach)
-						.map(stopReasonRepository::save)
-						.collect(Collectors.toList())));
+				.setChildren(new HashSet<>(reasons)));
+		
+		reasons.forEach((stopReason) -> stopReasonRepository.save(stopReason.setGroup(group)));
 		
 		return new ApiAnwser<>(beaconRepository.save(new Beacon()
 				.setName("Plieuse")
@@ -86,9 +87,14 @@ public class TestController {
 	}
 	
 	private void cleanup() {
+		beaconRepository.findAll().forEach((beacon) -> beaconRepository.save(beacon.setStopReasons(Collections.emptySet())));
+		stopReasonGroupRepository.findAll().forEach((stopReasonGroup) -> stopReasonGroupRepository.save(stopReasonGroup.setChildren(Collections.emptySet())));
+		stopReasonRepository.findAll().forEach((stopReason) -> stopReasonRepository.save(stopReason.setGroup(null).setBeacon(null)));
+
 		beaconRepository.deleteAll();
 		stopReasonGroupRepository.deleteAll();
 		stopReasonRepository.deleteAll();
+		
 		stopReasonCategoryRepository.deleteAll();
 		productFamilyRepository.deleteAll();
 	}

@@ -3,6 +3,7 @@ package jeldwen.backend.beacon.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +62,11 @@ public class StopReasonCategoryServiceImpl implements IStopReasonCategoryService
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public StopReasonCategory delete(long id) {
+		throw new NotYetImplementedException();
 	}
 	
 }

@@ -5,7 +5,7 @@
 				<list-card title="Availables" endpoint="/beacon" :linkFormatter="(item) => '/beacon/' + item.id">
 					<template v-slot="{ item }">
 						<v-list-item-avatar>
-							<v-icon>mdi-file</v-icon>
+							<v-icon>mdi-car-light-high</v-icon>
 						</v-list-item-avatar>
 						<v-list-item-content v-if="item.name">
 							<v-list-item-title v-text="item.name"></v-list-item-title>

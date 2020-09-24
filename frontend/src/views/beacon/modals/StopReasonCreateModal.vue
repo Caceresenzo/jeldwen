@@ -1,5 +1,5 @@
 <template>
-	<creation-modal ref="modal" title="Stop Reason Creation" endpoint="/beacon/stop-reason/" :payload="inputs" :on-open="resetInputs" @created="(object) => $emit('created', object)">
+	<creation-modal ref="modal" :title="title" :edit="editId !== null" :endpoint="endpoint" :payload="inputs" :on-close="resetInputs" @loaded="payloadToInputs" @created="(object) => $emit('created', object)" @updated="(object) => $emit('updated', object)">
 		<template v-slot="{ loading }">
 			<v-list>
 				<v-list-item>
@@ -43,17 +43,35 @@ export default {
 			name: null,
 			categoryId: null,
 		},
+		editId: null,
 	}),
+	computed: {
+		title() {
+			return this.editId ? "Stop Reason Edition" : "Stop Reason Creation";
+		},
+		endpoint() {
+			return this.editId ? `/beacon/stop-reason/${this.editId}` : "/beacon/stop-reason/";
+		},
+	},
 	methods: {
+		payloadToInputs(payload) {
+			this.inputs = {
+				name: payload.name,
+				categoryId: payload.category?.id,
+			};
+		},
 		open() {
 			this.$refs.modal.open();
+		},
+		edit(id) {
+			this.editId = id;
+
+			setTimeout(() => this.open(), 5);
 		},
 		close() {
 			this.$refs.modal.close();
 		},
 		refresh() {
-			console.log(this.inputs.categoryId);
-
 			this.dependencyLoading = true;
 
 			return this.$http
@@ -78,6 +96,8 @@ export default {
 			this.inputs.categoryId = category.id;
 		},
 		resetInputs() {
+			this.editId = null;
+
 			this.inputs = {
 				name: null,
 				categoryId: null,

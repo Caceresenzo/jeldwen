@@ -80,4 +80,8 @@ public abstract class TypeAwareMapper<E, D> {
 		return new PageImpl<>(internalListTransform(fromPage.getContent(), transformer), fromPage.getPageable(), fromPage.getTotalElements());
 	}
 	
+	public ModelMapper getWrappedModelMapper() {
+		return modelMapper;
+	}
+	
 }
