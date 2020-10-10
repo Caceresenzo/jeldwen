@@ -12,7 +12,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jeldwen.backend.beacon.server.ConsumableSocketServer;
 import jeldwen.backend.beacon.service.IBeaconClientService;
 import jeldwen.backend.beacon.service.IBeaconService;
 import jeldwen.beacon.message.model.IBeaconMessage;
@@ -21,9 +20,11 @@ import jeldwen.beacon.message.model.message.event.impl.connect.BeaconConnectedEv
 import jeldwen.beacon.message.model.message.event.impl.connect.BeaconDisconnectedEventMessage;
 import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
 import jeldwen.beacon.message.model.message.request.impl.config.ConfigRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.sensor.ForceSensorTriggerRequest;
 import jeldwen.beacon.message.model.message.response.impl.auth.AuthResponseMessage;
 import jeldwen.beacon.message.model.message.response.impl.config.ConfigResponseMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
+import jeldwen.socket.websocket.ConsumableWebSocketServer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,7 +44,7 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	/* Variables */
 	private final Map<WebSocket, String> socketToUniqueMap;
 	private final Map<String, WebSocket> uniqueToSocketMap;
-	private ConsumableSocketServer server;
+	private ConsumableWebSocketServer server;
 	
 	/* Constructor */
 	public BeaconClientServiceImpl() {
@@ -53,7 +54,7 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	
 	@PostConstruct
 	private void initialize() {
-		server = new ConsumableSocketServer(5600);
+		server = new ConsumableWebSocketServer(5600);
 		
 		server.start();
 		server.setOnMessage(this::parseAndDispatchMessage);
@@ -70,6 +71,18 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 		synchronized (LOCK) {
 			return new ArrayList<>(socketToUniqueMap.values());
 		}
+	}
+	
+	@Override
+	public boolean reconfigure(String unique) {
+		return answer(unique, new ConfigResponseMessage()
+				.setForced(true)
+				.setBeaconConfig(beaconService.getConfig(unique)));
+	}
+	
+	@Override
+	public boolean forceTrigger(String unique) {
+		return answer(unique, new ForceSensorTriggerRequest());
 	}
 	
 	@SneakyThrows
@@ -112,13 +125,21 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 		}
 	}
 	
+	public boolean answer(String unique, IBeaconMessage message) {
+		return answer(uniqueToSocketMap.get(unique), message);
+	}
+	
 	public boolean answer(WebSocket webSocket, IBeaconMessage message) {
+		if (webSocket == null) {
+			return false;
+		}
+		
 		try {
 			webSocket.send(beaconMessageService.stringify(message));
 			
 			return true;
 		} catch (Exception exception) {
-			throw new IllegalStateException("Cannot responde", exception);
+			throw new IllegalStateException("Cannot answer", exception);
 		}
 	}
 	

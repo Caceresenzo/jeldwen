@@ -61,19 +61,16 @@
 			</v-col>
 			<v-col cols="12">
 				<v-card class="red--text" :loading="loading">
-					<v-card-title>
-						<v-icon color="red" class="mr-2">mdi-lock</v-icon>
-						Danger Zone
-					</v-card-title>
+					<v-card-title>Danger Zone</v-card-title>
 					<v-divider></v-divider>
 					<v-list v-if="!loading">
 						<v-list-item>
 							<v-list-item-content>
-								<v-list-title>Delete the beacon</v-list-title>
+								<v-list-item-title>Delete the beacon</v-list-item-title>
 							</v-list-item-content>
-							<v-list-icon>
+							<v-list-item-icon>
 								<v-btn disabled color="error" depressed>DELETE</v-btn>
-							</v-list-icon>
+							</v-list-item-icon>
 						</v-list-item>
 					</v-list>
 				</v-card>

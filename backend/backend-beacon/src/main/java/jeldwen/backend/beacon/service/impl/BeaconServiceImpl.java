@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +19,7 @@ import jeldwen.backend.beacon.entity.Beacon;
 import jeldwen.backend.beacon.entity.StopReasonCategory;
 import jeldwen.backend.beacon.model.descriptor.SimpleBeaconDescriptor;
 import jeldwen.backend.beacon.repository.BeaconRepository;
+import jeldwen.backend.beacon.service.IBeaconClientService;
 import jeldwen.backend.beacon.service.IBeaconService;
 import jeldwen.backend.beacon.service.IProductFamilyService;
 import jeldwen.backend.beacon.service.IStopReasonGroupService;
@@ -42,6 +44,9 @@ public class BeaconServiceImpl implements IBeaconService {
 	
 	@Autowired
 	private IStopReasonService stopReasonService;
+	
+	@Autowired
+	private IBeaconClientService beaconClientService;
 	
 	/* Mappers */
 	private final TypeAwareMapper<Beacon, SimpleBeaconDescriptor> simpleBeaconDescriptorMapper;
@@ -152,6 +157,28 @@ public class BeaconServiceImpl implements IBeaconService {
 	@Override
 	public Beacon delete(long id) {
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public Boolean reconfigure(long id) {
+		return delegateToBeaconClientService(id, beaconClientService::reconfigure);
+	}
+	
+	@Override
+	public Boolean forceTrigger(long id) {
+		return delegateToBeaconClientService(id, beaconClientService::forceTrigger);
+	}
+	
+	private Boolean delegateToBeaconClientService(long id, Predicate<String> function) {
+		Optional<Beacon> optional = beaconRepository.findById(id);
+		
+		if (optional.isPresent()) {
+			Beacon beacon = optional.get();
+			
+			return function.test(beacon.getUnique());
+		}
+		
+		return null;
 	}
 	
 }

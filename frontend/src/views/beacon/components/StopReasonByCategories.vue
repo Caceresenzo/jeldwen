@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Empty from "./Empty"
+import Empty from "@/components/Empty"
 
 export default {
 	components: {

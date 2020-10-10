@@ -1,14 +1,12 @@
 <template>
 	<v-container fluid>
 		<v-row>
-			<v-col v-if="beacon && !configured" cols="12">
-				<v-alert class="my-0" type="warning">This beacon is not configured</v-alert>
-			</v-col>
 			<v-col cols="12">
+				<v-alert v-if="beacon && !configured" type="warning">This beacon is not configured</v-alert>
 				<v-card :loading="loading">
 					<v-card-title>{{ name }}</v-card-title>
 					<v-divider></v-divider>
-					<v-list v-if="beacon">
+					<v-list v-if="beacon" class="py-0">
 						<v-list-item @click>
 							<v-list-item-content>
 								<v-list-item-title>Connection</v-list-item-title>
@@ -25,7 +23,7 @@
 					</v-list>
 					<div v-if="beacon && configured">
 						<v-divider></v-divider>
-						<v-list subheader>
+						<v-list subheader class="py-0">
 							<v-subheader>Product Families</v-subheader>
 							<v-list-item v-for="productFamily of beacon.productFamilies" :key="productFamily.id" @click>
 								<v-list-item-content v-text="productFamily.name"></v-list-item-content>
@@ -34,7 +32,7 @@
 							<empty v-if="!beacon.productFamilies.length" />
 						</v-list>
 						<v-divider></v-divider>
-						<v-list subheader>
+						<v-list subheader class="py-0">
 							<v-subheader>Stop Reason Groups</v-subheader>
 							<v-list-item v-for="stopReasonGroup of beacon.stopReasonGroups" :key="stopReasonGroup.id" @click="openStopReasonGroup(stopReasonGroup.id)">
 								<v-list-item-content>
@@ -45,7 +43,7 @@
 							<empty v-if="!beacon.stopReasonGroups.length" />
 						</v-list>
 						<v-divider></v-divider>
-						<v-list subheader>
+						<v-list subheader class="py-0">
 							<v-subheader>Stop Reasons</v-subheader>
 							<stop-reason-by-categories class="mx-4" :items="(beacon || {}).stopReasons || []">
 								<template v-slot="{ category }">
@@ -69,18 +67,43 @@
 					</v-card-actions>
 				</v-card>
 			</v-col>
+			<v-col cols="12">
+				<v-card :loading="loading">
+					<v-card-title>Action Zone</v-card-title>
+					<v-divider></v-divider>
+					<v-list-item multiline>
+						<v-list-item-content>
+							<v-list-item-title>Force sensor trigger</v-list-item-title>
+							<v-list-item-subtitle>Fake a sensor trigger</v-list-item-subtitle>
+						</v-list-item-content>
+						<v-list-item-icon>
+							<v-btn :disabled="!connected" color="warning" depressed @click="forceSensorTrigger">TRIGGER</v-btn>
+						</v-list-item-icon>
+					</v-list-item>
+					<v-divider />
+					<v-list-item multiline>
+						<v-list-item-content>
+							<v-list-item-title>Force configuration</v-list-item-title>
+							<v-list-item-subtitle>Don't wait the beacon to restart, push a configuration by force</v-list-item-subtitle>
+						</v-list-item-content>
+						<v-list-item-icon>
+							<v-btn :disabled="!connected" color="warning" depressed @click="reconfigure">RECONFIGURE</v-btn>
+						</v-list-item-icon>
+					</v-list-item>
+				</v-card>
+			</v-col>
 		</v-row>
 	</v-container>
 </template>
 
 <script>
-import Empty from "./components/Empty";
+import beaconService from "@/service/beaconService";
+
 import BeaconConnectedState from "./components/BeaconConnectedState";
 import StopReasonByCategories from "./components/StopReasonByCategories";
 
 export default {
 	components: {
-		Empty,
 		BeaconConnectedState,
 		StopReasonByCategories,
 	},
@@ -89,9 +112,13 @@ export default {
 			beacon: null,
 			loading: false,
 			error: null,
+			connected: false,
 		};
 	},
 	computed: {
+		id() {
+			return this.$route.params.id;
+		},
 		name() {
 			return this.beacon?.name || this.beacon?.unique || "Beacon";
 		},
@@ -102,19 +129,27 @@ export default {
 			return this.beacon.name;
 		},
 	},
+	watch: {
+		beacon(val) {
+			this.connected = beaconService.isConnected(val.unique);
+		},
+	},
 	methods: {
-		countOr(n, message, or) {
-			if (n) {
-				return message + n;
+		onBeaconDisconnected(unique) {
+			if (this.beacon?.unique === unique) {
+				this.connected = false;
 			}
-
-			return or;
+		},
+		onBeaconConnected(unique) {
+			if (this.beacon?.unique === unique) {
+				this.connected = true;
+			}
 		},
 		refresh() {
 			this.loading = true;
 
 			return this.$http
-				.get("/beacon/" + this.$route.params.id)
+				.get(`/beacon/${this.id}`)
 				.then((response) => {
 					this.beacon = response.data.payload;
 				})
@@ -132,6 +167,74 @@ export default {
 		},
 		openStopReasonGroup(id) {
 			this.$router.push(`/beacon/stop-reason/group/${id}`);
+		},
+		reconfigure() {
+			this.$confirm({
+				title: "Reconfiguration Confirmation",
+				text: "If the beacon is being reconfigured, all data not send by the beacon will be lost.",
+			})
+				.then(() => {
+					this.loading = true;
+
+					this.$http
+						.post(`/beacon/${this.id}/reconfigure`, {})
+						.then((response) => {
+							let success = response.data.payload;
+
+							if (success === null) {
+								this.$error(
+									"Reconfiguration failed: Beacon not found"
+								);
+							} else if (success) {
+								this.$inform("Beacon reconfigured!");
+							} else {
+								this.$warn(
+									"Reconfiguration failed: Beacon not connected"
+								);
+							}
+						})
+						.catch((error) => {
+							this.error = error;
+						})
+						.then(() => {
+							this.loading = false;
+						});
+				})
+				.catch(() => {});
+		},
+		forceSensorTrigger() {
+			this.$confirm({
+				title: "Trigger Confirmation",
+				text: "Statistics might be wrong if you force a sensor trigger!",
+			})
+				.then(() => {
+					this.loading = true;
+
+					this.$http
+						.post(`/beacon/${this.id}/force-trigger`, {})
+						.then((response) => {
+							let success = response.data.payload;
+
+							if (success === null) {
+								this.$error(
+									"Trigger failed: Beacon not found"
+								);
+							} else if (success) {
+								this.$inform("Beacon's sensor triggered!");
+							} else {
+								this.$warn(
+									"Trigger failed: Beacon not connected"
+								);
+							}
+						})
+						.catch((error) => {
+							this.error = error;
+						})
+						.then(() => {
+							this.loading = false;
+						});
+				})
+				.catch(() => {});
 		},
 	},
 	created() {

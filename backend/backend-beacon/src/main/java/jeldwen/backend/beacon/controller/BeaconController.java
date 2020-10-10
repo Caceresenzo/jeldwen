@@ -36,4 +36,14 @@ public class BeaconController {
 		return new ApiAnwser<>(beaconService.update(id, body)).toResponseEntity();
 	}
 	
+	@PostMapping("{id}/reconfigure")
+	public ResponseEntity<?> reconfigure(@PathVariable long id) {
+		return new ApiAnwser<>(beaconService.reconfigure(id)).toResponseEntity();
+	}
+	
+	@PostMapping("{id}/force-trigger")
+	public ResponseEntity<?> forceTrigger(@PathVariable long id) {
+		return new ApiAnwser<>(beaconService.forceTrigger(id)).toResponseEntity();
+	}
+	
 }

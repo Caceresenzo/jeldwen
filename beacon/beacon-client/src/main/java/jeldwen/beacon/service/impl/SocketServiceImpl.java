@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import jeldwen.beacon.client.BeaconSocketClient;
 import jeldwen.beacon.message.model.IBeaconMessage;
 import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import jeldwen.beacon.service.IConfigService;
 import jeldwen.beacon.service.ISocketService;
+import jeldwen.socket.websocket.ConsumableWebSocketClient;
 import lombok.SneakyThrows;
 
 @Service
@@ -31,14 +31,14 @@ public class SocketServiceImpl implements ISocketService, DisposableBean {
 	private String serverUri;
 	
 	/* Variables */
-	private BeaconSocketClient beaconSocketClient;
+	private ConsumableWebSocketClient beaconSocketClient;
 	private boolean finishing;
 	
 	@PostConstruct
 	private void initialize() {
 		finishing = false;
 		
-		beaconSocketClient = new BeaconSocketClient(URI.create(serverUri));
+		beaconSocketClient = new ConsumableWebSocketClient(URI.create(serverUri));
 		beaconSocketClient.connect();
 		
 		beaconSocketClient.setOnMessage(this::handleMessage);

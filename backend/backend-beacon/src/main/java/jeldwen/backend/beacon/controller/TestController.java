@@ -73,7 +73,7 @@ public class TestController {
 		
 		return new ApiAnwser<>(beaconRepository.save(new Beacon()
 				.setName("Plieuse")
-				.setUnique("80-FA-5B-80-EE-46")
+				.setUnique("AA-7E-EA-56-A8-EC")
 				.setProductFamilies(families)
 				.setStopReasons(other)
 				.setStopReasonGroups(Arrays.asList(group)))).toResponseEntity();

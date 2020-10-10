@@ -25,7 +25,7 @@
 			<v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 			<v-toolbar-title>JELD-WEN</v-toolbar-title>
 			<v-spacer></v-spacer>
-			<v-btn :color="socketState.color" v-text="socketState.message">CONNECTED</v-btn>
+			<socket-state />
 		</v-app-bar>
 
 		<v-main>
@@ -43,33 +43,16 @@
 <script>
 import Vue from "vue";
 
+import SocketState from "./views/components/SocketState";
+
 export default {
+	components: {
+		SocketState,
+	},
 	name: "App",
 	data: () => ({
 		drawer: null,
-		socketState: {
-			message: "WAITING",
-			color: "warning",
-		},
 	}),
-	methods: {
-		onSocketConnect() {
-			this.socketState.message = "CONNECTING...";
-			this.socketState.color = "warning";
-		},
-		onSocketOpen() {
-			this.socketState.message = "CONNECTED";
-			this.socketState.color = "success";
-		},
-		onSocketClose() {
-			this.socketState.message = "NOT CONNECTED";
-			this.socketState.color = "error";
-		},
-		onSocketError(error) {
-			this.socketState.message = "ERROR: " + error;
-			this.socketState.color = "error";
-		},
-	},
 	created() {
 		// this.$vuetify.theme.dark = true;
 	},

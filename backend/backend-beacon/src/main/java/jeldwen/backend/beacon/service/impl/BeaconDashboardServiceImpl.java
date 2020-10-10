@@ -8,13 +8,13 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jeldwen.backend.beacon.server.ConsumableSocketServer;
 import jeldwen.backend.beacon.service.IBeaconClientService;
 import jeldwen.backend.beacon.service.IBeaconDashboardService;
 import jeldwen.beacon.message.model.message.event.impl.connect.BeaconConnectedEventMessage;
 import jeldwen.beacon.message.model.message.event.impl.connect.BeaconDisconnectedEventMessage;
 import jeldwen.beacon.message.model.message.response.impl.list.ConnectedBeaconListResponseMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
+import jeldwen.socket.websocket.ConsumableWebSocketServer;
 import lombok.SneakyThrows;
 
 @Service
@@ -27,11 +27,11 @@ public class BeaconDashboardServiceImpl implements IBeaconDashboardService, Disp
 	private IBeaconClientService beaconClientService;
 	
 	/* Variables */
-	private ConsumableSocketServer server;
+	private ConsumableWebSocketServer server;
 	
 	@PostConstruct
 	private void initialize() {
-		server = new ConsumableSocketServer(5700);
+		server = new ConsumableWebSocketServer(5700);
 		
 		server.start();
 		server.setOnOpen((webSocket, handshake) -> handleSocketOpen(webSocket));

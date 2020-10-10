@@ -1,6 +1,8 @@
 package jeldwen.beacon.message.service;
 
 import jeldwen.beacon.message.model.IBeaconMessage;
+import jeldwen.beacon.message.model.message.request.BaseRequestMessage;
+import jeldwen.beacon.message.model.message.response.BaseResponseMessage;
 
 public interface IBeaconMessageService {
 	
@@ -19,5 +21,9 @@ public interface IBeaconMessageService {
 	void register(Object object);
 	
 	void unregister(Object object);
+
+	void registerRequestClass(String name, Class<? extends BaseRequestMessage> clazz);
+
+	void registerResponseClass(String name, Class<? extends BaseResponseMessage> clazz);
 	
 }

@@ -10,7 +10,11 @@ public interface ICycleService {
 	
 	boolean close();
 	
-	boolean getOpenState();
+	boolean isUsable();
+	
+	boolean isOpen();
+	
+	boolean isClose();
 	
 	boolean next();
 	
@@ -18,6 +22,16 @@ public interface ICycleService {
 	
 	boolean report(StopReasonConfig stopReason);
 	
+	boolean isStop();
+	
 	void setConfig(BeaconConfig config);
+	
+	void pulseCycle();
+	
+	void notifyState();
+	
+	void notifyState(boolean withHistory);
+
+	void signal();
 	
 }

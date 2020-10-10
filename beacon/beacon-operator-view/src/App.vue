@@ -1,0 +1,70 @@
+<template>
+	<v-app id="inspire">
+		<v-navigation-drawer v-model="drawer" app disable-resize-watcher disable-route-watcher clipped>
+			<v-list dense>
+				<v-list-item link>
+					<v-list-item-action>
+						<v-icon>mdi-update</v-icon>
+					</v-list-item-action>
+					<v-list-item-content>
+						<v-list-item-title>Update the configuration</v-list-item-title>
+					</v-list-item-content>
+				</v-list-item>
+			</v-list>
+		</v-navigation-drawer>
+
+		<v-app-bar app color="primary" class="white--text" flat dense clipped-left>
+			<v-app-bar-nav-icon @click.stop="drawer = !drawer" color="white">
+				<v-icon>mdi-cog</v-icon>
+			</v-app-bar-nav-icon>
+			<v-toolbar-title>Plieuse</v-toolbar-title>
+			<v-spacer></v-spacer>
+			<socket-state />
+		</v-app-bar>
+
+		<v-main>
+			<transition name="fade" mode="out-in">
+				<router-view></router-view>
+			</transition>
+		</v-main>
+
+		<v-footer app>
+			<v-spacer></v-spacer>
+			<span>&copy; {{ new Date().getFullYear() }}</span>
+		</v-footer>
+	</v-app>
+</template>
+
+<script>
+import SocketState from "./views/components/SocketState";
+
+export default {
+	components: {
+		SocketState,
+	},
+	name: "App",
+	data: () => ({
+		drawer: false,
+	}),
+	created() {
+		this.$socket.start();
+	},
+};
+</script>
+
+<style>
+	.fade-enter-active,
+	.fade-leave-active {
+		transition-duration: 0.3s;
+		transition-property: opacity;
+		transition-timing-function: ease;
+	}
+
+	.fade-enter,
+	.fade-leave-active {
+		opacity: 0;
+	}
+	html {
+		overflow-y: auto;
+	}
+</style>
