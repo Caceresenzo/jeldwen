@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import store from "@/store"
 
 class SocketService extends EventEmitter {
 
@@ -28,10 +29,12 @@ class SocketService extends EventEmitter {
 
 	onSocketOpen(event) {
 		this.emit('onSocketOpen', event);
+		store.commit('setConnected', true);
 	}
 
 	onSocketClose(event) {
 		this.emit('onSocketClose', event);
+		store.commit('setConnected', false);
 
 		setTimeout(() => this.connect(), 1000);
 	}

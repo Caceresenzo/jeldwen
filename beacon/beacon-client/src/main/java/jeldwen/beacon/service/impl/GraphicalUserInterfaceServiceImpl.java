@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import jeldwen.beacon.message.model.IBeaconMessage;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import jeldwen.beacon.model.event.SocketConnectedEvent;
+import jeldwen.beacon.service.IGraphicalUserInterfaceService;
 import jeldwen.socket.websocket.ConsumableWebSocketServer;
 import lombok.SneakyThrows;
 

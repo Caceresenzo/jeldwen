@@ -2,7 +2,7 @@ import socketService from '../service/socketService'
 import beaconService from '../service/beaconService'
 
 let socketEvents = ["onSocketConnect", "onSocketOpen", "onSocketClose", "onSocketError", "onSocketMessage"]
-let beaconEvents = ["onWorkstationOpen", "onWorkstationClose", "onRhythmSync", "onFamilyChanged", "onConfig"]
+let beaconEvents = ["onWorkstationOpen", "onWorkstationClose", "onRhythmSync", "onFamilyChanged", "onConfig", "onHistory", "onReported"]
 
 let events = {
 	socket: {
@@ -22,6 +22,8 @@ let use = function(method, context) {
 
 			if (listener) {
 				config.emitter[method](event, listener);
+
+				console.log(`${context.$vnode.tag}: ${method}: ${event}`)
 			}
 		}
 	}

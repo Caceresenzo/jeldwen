@@ -1,4 +1,4 @@
-package jeldwen.beacon.service.impl;
+package jeldwen.beacon.service;
 
 import jeldwen.beacon.message.model.IBeaconMessage;
 

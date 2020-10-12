@@ -17,7 +17,7 @@ public class SimpleHourPerHourDescriptor {
 	private long objective;
 	
 	public double getPercent() {
-		return (double) objective / (double) produced;
+		return ((double) produced + 1) / ((double) objective + 1);
 	}
 	
 }

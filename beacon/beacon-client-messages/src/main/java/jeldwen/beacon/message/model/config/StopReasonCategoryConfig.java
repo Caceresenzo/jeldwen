@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class StopReasonCategoryConfig {
+public class StopReasonCategoryConfig implements ConfigObject {
 	
 	private long id;
 	private String name;

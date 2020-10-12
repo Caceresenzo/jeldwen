@@ -2,14 +2,9 @@
 	<v-app id="inspire">
 		<v-navigation-drawer v-model="drawer" app disable-resize-watcher disable-route-watcher clipped>
 			<v-list dense>
-				<v-list-item link>
-					<v-list-item-action>
-						<v-icon>mdi-update</v-icon>
-					</v-list-item-action>
-					<v-list-item-content>
-						<v-list-item-title>Update the configuration</v-list-item-title>
-					</v-list-item-content>
-				</v-list-item>
+				<i18n-setting />
+				<dark-mode-setting />
+				<update-config-action />
 			</v-list>
 		</v-navigation-drawer>
 
@@ -17,7 +12,7 @@
 			<v-app-bar-nav-icon @click.stop="drawer = !drawer" color="white">
 				<v-icon>mdi-cog</v-icon>
 			</v-app-bar-nav-icon>
-			<v-toolbar-title>Plieuse</v-toolbar-title>
+			<v-toolbar-title>{{ $store.getters.beaconName || $t('controls.emptyName') }}</v-toolbar-title>
 			<v-spacer></v-spacer>
 			<socket-state />
 		</v-app-bar>
@@ -28,25 +23,31 @@
 			</transition>
 		</v-main>
 
-		<v-footer app>
+		<v-footer app style="z-index: 100" dark>
 			<v-spacer></v-spacer>
-			<span>&copy; {{ new Date().getFullYear() }}</span>
+			<span>{{ $t("version") }}</span>
 		</v-footer>
 	</v-app>
 </template>
 
 <script>
-import SocketState from "./views/components/SocketState";
+import SocketState from "@/views/components/SocketState";
+import UpdateConfigAction from "@/views/components/drawer/UpdateConfigAction";
+import I18nSetting from "@/views/components/drawer/I18nSetting";
+import DarkModeSetting from "@/views/components/drawer/DarkModeSetting";
 
 export default {
 	components: {
 		SocketState,
+		UpdateConfigAction,
+		I18nSetting,
+		DarkModeSetting,
 	},
 	name: "App",
 	data: () => ({
 		drawer: false,
 	}),
-	created() {
+	mounted() {
 		this.$socket.start();
 	},
 };

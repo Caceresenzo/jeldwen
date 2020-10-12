@@ -21,7 +21,7 @@ public class WorkstationStateResponse extends BaseResponseMessage {
 	private boolean opened;
 	private BeaconConfig beaconConfig;
 	private Long activeFamilyId;
-	private long seconds;
+	private Long seconds;
 	private SimpleHourPerHourDescriptor currentHourPerHour;
 	private List<SimpleHourPerHourDescriptor> hourPerHourHistory;
 	

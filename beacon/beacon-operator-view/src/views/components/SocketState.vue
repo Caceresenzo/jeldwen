@@ -9,25 +9,30 @@
 export default {
 	name: "socket-state",
 	data: () => ({
-		message: "WAITING",
+		state: "waiting",
 		color: "warning",
 	}),
+	computed: {
+		message() {
+			return this.$t(`socket.state.${this.state}`);
+		}
+	},
 	methods: {
 		onSocketConnect() {
-			this.message = "CONNECTING...";
+			this.state = "connecting";
 			this.color = "warning";
 		},
 		onSocketOpen() {
-			this.message = "CONNECTED";
+			this.state = "connected";
 			this.color = "success";
 		},
 		onSocketError(error) {
-			this.message = "ERROR";
+			this.state = "error";
 			this.color = "error";
 		},
 		onSocketClose(event) {
-			if (this.color !== "error") {
-				this.message = "NOT CONNECTED";
+			if (this.state !== "error") {
+				this.state = "close";
 				this.color = "error";
 			}
 		},

@@ -3,7 +3,9 @@ package jeldwen.beacon.service.impl;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Service;
 import jeldwen.beacon.entity.HourPerHour;
 import jeldwen.beacon.message.model.descriptor.SimpleHourPerHourDescriptor;
 import jeldwen.beacon.repository.HourPerHourRepository;
-import jeldwen.beacon.service.ICycleService;
+import jeldwen.beacon.service.IBeaconService;
 import jeldwen.beacon.service.IHourPerHourService;
 
 @Service
@@ -28,7 +30,7 @@ public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBe
 	private HourPerHourRepository hourPerHourRepository;
 	
 	@Autowired
-	private ICycleService cycleService;
+	private IBeaconService beaconService;
 	
 	/* Variables */
 	private HourPerHour currentHourPerHour;
@@ -69,10 +71,10 @@ public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBe
 			}
 			
 			saveHourPerHour();
-			findOrCreateHourlyCycle();
+			currentHourPerHour = findOrCreateHourlyCycle();
 		}
 		
-		cycleService.notifyState(true);
+		beaconService.notifyState(true);
 	}
 	
 	private boolean saveHourPerHour() {
@@ -116,10 +118,29 @@ public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBe
 				.setObjective(hourPerHour.getObjective())
 				.setProduced(hourPerHour.getProduced());
 	}
-
+	
 	@Override
 	public List<SimpleHourPerHourDescriptor> history() {
-		return null;
+		LocalDate date = LocalDate.now();
+		long hour = LocalTime.now().getHour();
+		
+		return hourPerHourRepository.findAll()
+				.stream()
+				.filter((hourPerHour) -> {
+					if (Objects.equals(hourPerHour.getDate(), date)) {
+						return hourPerHour.getHour() < hour;
+					}
+					
+					return true;
+				})
+				.map((hourPerHour) -> new SimpleHourPerHourDescriptor()
+						.setDate(hourPerHour.getDate())
+						.setHour(hourPerHour.getHour())
+						.setOpen(hourPerHour.getOpen())
+						.setStop(hourPerHour.getStop())
+						.setObjective(hourPerHour.getObjective())
+						.setProduced(hourPerHour.getProduced()))
+				.collect(Collectors.toList());
 	}
 	
 }

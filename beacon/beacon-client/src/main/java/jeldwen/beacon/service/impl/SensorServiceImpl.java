@@ -13,7 +13,7 @@ import com.pi4j.wiringpi.GpioInterrupt;
 import com.pi4j.wiringpi.GpioInterruptEvent;
 import com.pi4j.wiringpi.GpioInterruptListener;
 
-import jeldwen.beacon.service.ICycleService;
+import jeldwen.beacon.service.IBeaconService;
 import jeldwen.beacon.service.ISensorService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SensorServiceImpl implements ISensorService, DisposableBean, GpioInterruptListener {
 	
 	@Autowired
-	private ICycleService cycleService;
+	private IBeaconService beaconService;
 	
 	/* Variables */
 	private GpioController gpio;
@@ -49,7 +49,7 @@ public class SensorServiceImpl implements ISensorService, DisposableBean, GpioIn
 	
 	@Override
 	public void trigger() {
-		cycleService.signal();
+		beaconService.signal(false);
 	}
 
 	@Override

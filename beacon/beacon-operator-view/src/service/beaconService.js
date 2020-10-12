@@ -1,5 +1,6 @@
 import EventEmitter from 'events'
 import socketService from "./socketService"
+import store from "@/store"
 
 class BeaconService extends EventEmitter {
 
@@ -13,6 +14,7 @@ class BeaconService extends EventEmitter {
 			"rhythm-sync": (message) => this.onRhythmSync(message),
 			"family-changed": (message) => this.onFamilyChanged(message),
 			"config": (message) => this.onConfig(message),
+			"reported": (message) => this.onReported(message),
 		}
 	}
 
@@ -34,26 +36,54 @@ class BeaconService extends EventEmitter {
 		this.onConfig(message);
 		this.onFamilyChanged(message);
 		this.onRhythmSync(message);
+		this.onHistory(message);
 	}
 
 	onRhythmSync(message) {
-		this.emit("onRhythmSync", message.seconds, message.currentHourPerHour);
+		const { seconds, currentHourPerHour } = message;
+
+		this.emit("onRhythmSync", seconds, currentHourPerHour);
+		store.commit('cycle/setSeconds', seconds);
+		store.commit('hourPerHour/setCurrent', currentHourPerHour);
 	}
 
 	onFamilyChanged(message) {
-		this.emit("onFamilyChanged", message.activeFamilyId);
+		const id = message.activeFamilyId;
+
+		this.emit("onFamilyChanged", id);
+		store.commit('cycle/setActiveFamilyId', id);
 	}
 
 	onWorkstationOpen() {
 		this.emit("onWorkstationOpen");
+		store.commit('setOpened', true);
 	}
 
 	onWorkstationClose() {
 		this.emit("onWorkstationClose");
+		store.commit('setOpened', false);
 	}
 
 	onConfig(message) {
-		this.emit("onConfig", message.beaconConfig);
+		const config = message.beaconConfig;
+
+		this.emit("onConfig", config);
+		store.commit('setConfig', config);
+	}
+
+	onHistory(message) {
+		const history = message.hourPerHourHistory;
+
+		if (history !== null) {
+			this.emit("onHistory", history);
+			store.commit('hourPerHour/setHistory', history);
+		}
+	}
+
+	onReported(message) {
+		const { success } = message;
+
+		this.emit("onReported", history);
 	}
 
 	open() {
