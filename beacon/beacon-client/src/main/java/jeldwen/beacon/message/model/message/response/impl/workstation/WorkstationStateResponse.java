@@ -3,8 +3,8 @@ package jeldwen.beacon.message.model.message.response.impl.workstation;
 import java.util.List;
 
 import jeldwen.beacon.message.model.config.BeaconConfig;
-import jeldwen.beacon.message.model.descriptor.SimpleHourPerHourDescriptor;
 import jeldwen.beacon.message.model.message.response.BaseResponseMessage;
+import jeldwen.beacon.model.descriptor.SimpleHourPerHourDescriptor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;

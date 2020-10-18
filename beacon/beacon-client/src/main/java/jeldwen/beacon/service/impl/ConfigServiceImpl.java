@@ -43,6 +43,8 @@ public class ConfigServiceImpl implements IConfigService {
 			} else {
 				try {
 					current = load();
+					
+					log.info("Loaded config from file.");
 				} catch (Exception exception) {
 					log.warn("Failed to load local config.", exception);
 				}

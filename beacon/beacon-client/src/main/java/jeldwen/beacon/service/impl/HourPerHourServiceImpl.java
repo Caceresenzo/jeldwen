@@ -2,6 +2,7 @@ package jeldwen.beacon.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,16 +10,18 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import jeldwen.beacon.entity.HourPerHour;
-import jeldwen.beacon.message.model.descriptor.SimpleHourPerHourDescriptor;
+import jeldwen.beacon.model.descriptor.SimpleHourPerHourDescriptor;
 import jeldwen.beacon.repository.HourPerHourRepository;
 import jeldwen.beacon.service.IBeaconService;
 import jeldwen.beacon.service.IHourPerHourService;
+import jeldwen.beacon.service.ISocketService;
 
 @Service
 public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBean {
@@ -31,6 +34,9 @@ public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBe
 	
 	@Autowired
 	private IBeaconService beaconService;
+	
+	@Autowired
+	private ISocketService socketService;
 	
 	/* Variables */
 	private HourPerHour currentHourPerHour;
@@ -131,7 +137,7 @@ public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBe
 						return hourPerHour.getHour() < hour;
 					}
 					
-					return true;
+					return hourPerHour.getDate().isAfter(LocalDate.now().minusDays(1));
 				})
 				.map((hourPerHour) -> new SimpleHourPerHourDescriptor()
 						.setDate(hourPerHour.getDate())
@@ -140,7 +146,14 @@ public class HourPerHourServiceImpl implements IHourPerHourService, DisposableBe
 						.setStop(hourPerHour.getStop())
 						.setObjective(hourPerHour.getObjective())
 						.setProduced(hourPerHour.getProduced()))
+				.sorted(Comparator.<SimpleHourPerHourDescriptor>reverseOrder())
+				.limit(12)
 				.collect(Collectors.toList());
+	}
+	
+	@Override
+	public void report() {
+		throw new NotYetImplementedException();
 	}
 	
 }

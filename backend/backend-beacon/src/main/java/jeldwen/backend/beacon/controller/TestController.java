@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jeldwen.backend.beacon.entity.Beacon;
 import jeldwen.backend.beacon.entity.ProductFamily;
+import jeldwen.backend.beacon.entity.ReportedStopReason;
 import jeldwen.backend.beacon.entity.StopReason;
 import jeldwen.backend.beacon.entity.StopReasonCategory;
 import jeldwen.backend.beacon.entity.StopReasonGroup;
@@ -84,6 +86,11 @@ public class TestController {
 		cleanup();
 		
 		return new ApiAnwser<>().toResponseEntity();
+	}
+	
+	@GetMapping("x")
+	public ResponseEntity<?> x() {
+		return new ApiAnwser<>(new ReportedStopReason().setDuration(TimeUnit.DAYS.toSeconds(5))).toResponseEntity();
 	}
 	
 	private void cleanup() {

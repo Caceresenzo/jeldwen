@@ -3,7 +3,7 @@
 		<template v-slot="{ }">
 			<v-list>
 				<v-list-item>
-					<v-text-field v-model="inputs.name" label="Name*" required></v-text-field>
+					<v-text-field v-model="inputs.name" :label="$t('common.fields.name')" required></v-text-field>
 				</v-list-item>
 				<v-list-item>
 					<v-text-field v-model="inputs.cycleTime" label="Cycle Time*" required></v-text-field>

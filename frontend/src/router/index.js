@@ -17,46 +17,24 @@ const routes = [
 	},
 	{
 		path: '/beacon/:id',
+		name: 'Beacon Details',
 		component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/BeaconDetails.vue')
 	},
 	{
 		path: '/beacon/:id/edit',
+		name: 'Beacon Edit',
 		component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/BeaconEdit.vue')
 	},
 	{
 		path: '/beacon/stop-reason/group/:id',
+		name: 'Beacon Group Details',
 		component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/StopReasonGroupDetails.vue')
 	},
-	// {
-	// 	path: '/beacon',
-	// 	name: 'Beacon',
-	// 	component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/BeaconPage.vue')
-	// },
-	// {
-	// 	path: '/beacon/:id',
-	// 	component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/BeaconDetails.vue')
-	// },
-	// {
-	// 	path: '/beacon/detector/:id',
-	// 	component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/DetectorEdit.vue')
-	// },
-	// {
-	// 	path: '/beacon/stop-reason-group/:id',
-	// 	component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/StopReasonGroupDetails.vue')
-	// },
-	// {
-	// 	path: '/operator-selector',
-	// 	component: () => import(/* webpackChunkName: "operator" */ '../views/operator/OperatorBeaconSelector.vue')
-	// },
-	// {
-	// 	path: '/operator/:id',
-	// 	component: () => import(/* webpackChunkName: "operator" */ '../views/operator/OperatorRoom.vue')
-	// },
-	// {
-	// 	path: '/about',
-	// 	name: 'About',
-	// 	component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-	// },
+	{
+		path: '/settings',
+		name: 'Settings',
+		component: () => import(/* webpackChunkName: "settings" */ '../views/settings/Settings.vue')
+	},
 	{
 		path: '*',
 		name: '404',

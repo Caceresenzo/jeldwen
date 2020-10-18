@@ -12,17 +12,21 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jeldwen.backend.beacon.entity.Beacon;
 import jeldwen.backend.beacon.service.IBeaconClientService;
 import jeldwen.backend.beacon.service.IBeaconService;
+import jeldwen.backend.beacon.service.IReportedStopReasonService;
 import jeldwen.beacon.message.model.IBeaconMessage;
 import jeldwen.beacon.message.model.config.BeaconConfig;
 import jeldwen.beacon.message.model.message.event.impl.connect.BeaconConnectedEventMessage;
 import jeldwen.beacon.message.model.message.event.impl.connect.BeaconDisconnectedEventMessage;
 import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
 import jeldwen.beacon.message.model.message.request.impl.config.ConfigRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.report.StopReasonReportRequest;
 import jeldwen.beacon.message.model.message.request.impl.sensor.ForceSensorTriggerRequest;
 import jeldwen.beacon.message.model.message.response.impl.auth.AuthResponseMessage;
 import jeldwen.beacon.message.model.message.response.impl.config.ConfigResponseMessage;
+import jeldwen.beacon.message.model.message.response.impl.report.ReportedStopReasonResponse;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import jeldwen.socket.websocket.ConsumableWebSocketServer;
 import lombok.SneakyThrows;
@@ -40,6 +44,9 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	
 	@Autowired
 	private IBeaconService beaconService;
+	
+	@Autowired
+	private IReportedStopReasonService reportedStopReasonService;
 	
 	/* Variables */
 	private final Map<WebSocket, String> socketToUniqueMap;
@@ -87,12 +94,16 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 	
 	@SneakyThrows
 	private void parseAndDispatchMessage(WebSocket webSocket, String message) {
-		IBeaconMessage beaconMessage = beaconMessageService.parseAndDispatch(message);
+		IBeaconMessage beaconMessage = beaconMessageService.parse(message);
 		
 		if (beaconMessage instanceof AuthRequestMessage) {
 			onBeaconRequestAuthentication(webSocket, (AuthRequestMessage) beaconMessage);
 		} else if (beaconMessage instanceof ConfigRequestMessage) {
 			onBeaconRequestConfig(webSocket, (ConfigRequestMessage) beaconMessage);
+		} else if (beaconMessage instanceof StopReasonReportRequest) {
+			onStopReasonReportRequest(webSocket, (StopReasonReportRequest) beaconMessage);
+		} else {
+			beaconMessageService.dispatch(beaconMessage);
 		}
 	}
 	
@@ -185,6 +196,20 @@ public class BeaconClientServiceImpl implements IBeaconClientService, Disposable
 		}
 		
 		return answer(webSocket, new ConfigResponseMessage().setReason(ConfigResponseMessage.Reason.NOT_AUTHENTICATED));
+	}
+	
+	private void onStopReasonReportRequest(WebSocket webSocket, StopReasonReportRequest request) {
+		String unique = socketToUniqueMap.get(webSocket);
+		
+		if (unique != null) {
+			Beacon beacon = beaconService.find(unique);
+			
+			if (beacon != null) {
+				reportedStopReasonService.store(beacon, request);
+				
+				answer(webSocket, new ReportedStopReasonResponse().setId(request.getId()));
+			}
+		}
 	}
 	
 }

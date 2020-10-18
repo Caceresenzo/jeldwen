@@ -18,6 +18,7 @@ import jeldwen.beacon.message.model.MessageType;
 import jeldwen.beacon.message.model.message.request.BaseRequestMessage;
 import jeldwen.beacon.message.model.message.request.impl.auth.AuthRequestMessage;
 import jeldwen.beacon.message.model.message.request.impl.config.ConfigRequestMessage;
+import jeldwen.beacon.message.model.message.request.impl.report.StopReasonReportRequest;
 import jeldwen.beacon.message.model.message.request.impl.sensor.ForceSensorTriggerRequest;
 import jeldwen.beacon.message.model.message.request.impl.workstation.WorkstationCloseRequest;
 import jeldwen.beacon.message.model.message.request.impl.workstation.WorkstationOpenRequest;
@@ -25,6 +26,7 @@ import jeldwen.beacon.message.model.message.response.BaseResponseMessage;
 import jeldwen.beacon.message.model.message.response.impl.auth.AuthResponseMessage;
 import jeldwen.beacon.message.model.message.response.impl.config.ConfigResponseMessage;
 import jeldwen.beacon.message.model.message.response.impl.list.ConnectedBeaconListResponseMessage;
+import jeldwen.beacon.message.model.message.response.impl.report.ReportedStopReasonResponse;
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,10 +60,12 @@ public class BeaconMessageServiceImpl implements IBeaconMessageService {
 		registerRequestClass(WorkstationOpenRequest.NAME, WorkstationOpenRequest.class);
 		registerRequestClass(WorkstationCloseRequest.NAME, WorkstationCloseRequest.class);
 		registerRequestClass(ForceSensorTriggerRequest.NAME, ForceSensorTriggerRequest.class);
+		registerRequestClass(StopReasonReportRequest.NAME, StopReasonReportRequest.class);
 		
 		registerResponseClass(AuthResponseMessage.NAME, AuthResponseMessage.class);
 		registerResponseClass(ConfigResponseMessage.NAME, ConfigResponseMessage.class);
 		registerResponseClass(ConnectedBeaconListResponseMessage.NAME, ConnectedBeaconListResponseMessage.class);
+		registerResponseClass(ReportedStopReasonResponse.NAME, ReportedStopReasonResponse.class);
 	}
 	
 	@Override

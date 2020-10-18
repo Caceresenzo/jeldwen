@@ -11,6 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import jeldwen.backend.common.model.api.AbstractApiResponse;
 import jeldwen.backend.common.model.api.error.ApiSubError;
 import jeldwen.backend.common.model.api.error.ApiValidationError;
@@ -21,11 +25,17 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
+@JsonPropertyOrder({ "status", "message", "debugMessage, subErrors", "metadata" })
 public class ApiError extends AbstractApiResponse {
 	
 	/* Variables */
+	@JsonInclude(Include.NON_NULL)
 	private String message;
+	
+	@JsonInclude(Include.NON_NULL)
 	private String debugMessage;
+	
+	@JsonInclude(Include.NON_NULL)
 	private List<ApiSubError> subErrors;
 	
 	/* Constructor */
@@ -43,7 +53,7 @@ public class ApiError extends AbstractApiResponse {
 		super(status);
 		
 		this.message = message;
-		this.debugMessage = throwable != null ? throwable.getLocalizedMessage() : null;
+		setDebugMessage(throwable != null ? throwable.getLocalizedMessage() : null);
 	}
 	
 	private ApiError addSubError(ApiSubError subError) {

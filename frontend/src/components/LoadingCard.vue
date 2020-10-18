@@ -1,14 +1,16 @@
 <template>
 	<v-card :loading="loading">
-		<v-card-title v-if="title" v-text="title"></v-card-title>
-		<v-divider></v-divider>
+		<template v-if="title">
+			<v-card-title>{{ title }}</v-card-title>
+			<v-divider />
+		</template>
 		<slot v-bind:payload="payload">{{ payload }}</slot>
-		<v-divider></v-divider>
+		<v-divider />
 		<v-card-actions>
 			<v-btn v-if="error" text color="error" :disabled="loading" v-text="error" @click="refresh()"></v-btn>
 			<v-spacer></v-spacer>
 			<slot name="actions" v-bind:payload="payload"></slot>
-			<v-btn text color="primary" :disabled="loading" @click="refresh()">REFRESH</v-btn>
+			<v-btn text color="primary" :disabled="loading" @click="refresh()">{{ $t("common.refresh") }}</v-btn>
 		</v-card-actions>
 	</v-card>
 </template>

@@ -1,10 +1,10 @@
 package jeldwen.backend.beacon.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import jeldwen.backend.beacon.dto.StopReasonCategoryUpdateBody;
@@ -18,45 +18,30 @@ import jeldwen.backend.common.util.TypeAwareMapper;
 public class StopReasonCategoryServiceImpl implements IStopReasonCategoryService {
 	
 	@Autowired
-	private StopReasonCategoryRepository stopReasonCategoryRepository;
+	private StopReasonCategoryRepository repository;
 	
 	/* Mappers */
-	private final TypeAwareMapper<StopReasonCategory, SimpleStopReasonCategoryDescriptor> simpleStopReasonCategoryDescriptorMapper;
+	private final TypeAwareMapper<StopReasonCategory, SimpleStopReasonCategoryDescriptor> mapper;
 	
 	/* Constructor */
 	public StopReasonCategoryServiceImpl() {
-		this.simpleStopReasonCategoryDescriptorMapper = new TypeAwareMapper<StopReasonCategory, SimpleStopReasonCategoryDescriptor>() {
+		this.mapper = new TypeAwareMapper<StopReasonCategory, SimpleStopReasonCategoryDescriptor>() {
 		};
 	}
 	
 	@Override
-	public List<SimpleStopReasonCategoryDescriptor> listAll() {
-		return simpleStopReasonCategoryDescriptorMapper.toDtos(stopReasonCategoryRepository.findAll());
-	}
-	
-	@Override
-	public StopReasonCategory find(long id) {
-		return stopReasonCategoryRepository.findById(id).orElse(null);
-	}
-	
-	@Override
-	public List<StopReasonCategory> listAllByIds(List<Long> ids) {
-		return stopReasonCategoryRepository.findAllById(ids);
-	}
-	
-	@Override
 	public StopReasonCategory create(StopReasonCategoryUpdateBody body) {
-		return stopReasonCategoryRepository.save(new StopReasonCategory()
+		return repository.save(new StopReasonCategory()
 				.setName(body.getName())
 				.setColor(body.getColor()));
 	}
 	
 	@Override
 	public StopReasonCategory update(long id, StopReasonCategoryUpdateBody body) {
-		Optional<StopReasonCategory> optional = stopReasonCategoryRepository.findById(id);
+		Optional<StopReasonCategory> optional = repository.findById(id);
 		
 		if (optional.isPresent()) {
-			return stopReasonCategoryRepository.save(optional.get()
+			return repository.save(optional.get()
 					.setName(body.getName())
 					.setColor(body.getColor()));
 		}
@@ -67,6 +52,16 @@ public class StopReasonCategoryServiceImpl implements IStopReasonCategoryService
 	@Override
 	public StopReasonCategory delete(long id) {
 		throw new NotYetImplementedException();
+	}
+	
+	@Override
+	public TypeAwareMapper<StopReasonCategory, SimpleStopReasonCategoryDescriptor> getMapper() {
+		return mapper;
+	}
+	
+	@Override
+	public JpaRepository<StopReasonCategory, Long> getRepository() {
+		return repository;
 	}
 	
 }

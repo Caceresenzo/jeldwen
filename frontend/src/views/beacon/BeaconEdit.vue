@@ -53,9 +53,9 @@
 					<v-card-actions>
 						<v-btn v-if="error" text color="error" :disabled="loading" v-text="error" @click="refresh()"></v-btn>
 						<v-spacer></v-spacer>
-						<v-btn text color="primary" :disabled="loading" @click="cancel()" v-text="updated === null ? 'CANCEL' : 'GO BACK'"></v-btn>
-						<v-btn text color="primary" :disabled="loading" @click="update()">UPDATE</v-btn>
-						<v-btn text color="primary" :disabled="loading" @click="refresh()">REFRESH</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="cancel()">{{ $t("common." + (updated === null ? 'cancel' : 'go-back')) }}</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="update()">{{ $t("common.update") }}</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="refresh()">{{ $t("common.refresh") }}</v-btn>
 					</v-card-actions>
 				</v-card>
 			</v-col>

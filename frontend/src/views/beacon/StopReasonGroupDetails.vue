@@ -19,8 +19,7 @@
 													<v-icon>mdi-vector-polyline-remove</v-icon>
 												</v-btn>
 											</template>
-											Detach
-											<br />(free from group)
+											{{ $t("beacon.stop-reason.action.detach._") }}
 										</v-tooltip>
 										<v-tooltip top @click.prevent.self>
 											<template v-slot:activator="{ on, attrs }">
@@ -28,7 +27,7 @@
 													<v-icon>mdi-delete</v-icon>
 												</v-btn>
 											</template>
-											Remove form everywhere
+											{{ $t("beacon.stop-reason.action.delete._") }}
 										</v-tooltip>
 										<v-tooltip top @click.prevent.self>
 											<template v-slot:activator="{ on, attrs }">
@@ -36,7 +35,7 @@
 													<v-icon>mdi-pencil</v-icon>
 												</v-btn>
 											</template>
-											Edit
+											{{ $t("beacon.stop-reason.action.edit._") }}
 										</v-tooltip>
 									</v-list-item-icon>
 								</v-list-item>
@@ -47,8 +46,8 @@
 					<v-card-actions>
 						<v-btn v-if="error" text color="error" :disabled="loading" v-text="error" @click="refresh()"></v-btn>
 						<v-spacer></v-spacer>
-						<v-btn text color="primary" :disabled="loading" @click="edit()">EDIT</v-btn>
-						<v-btn text color="primary" :disabled="loading" @click="refresh()">REFRESH</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="edit()">{{ $t("common.edit") }}</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="refresh()">{{ $t("common.refresh") }}</v-btn>
 					</v-card-actions>
 				</v-card>
 			</v-col>
@@ -125,8 +124,8 @@ export default {
 		},
 		detachChild(stopReasonId) {
 			this.$confirm({
-				title: "Detach Confirmation",
-				text: "Do you want to detach this stop reason from this group?",
+				title: this.$t("beacon.stop-reason.action.detach.confirm.title"),
+				text: this.$t("beacon.stop-reason.action.detach.confirm.text"),
 			})
 				.then(() => {
 					this.loading = true;
@@ -146,8 +145,8 @@ export default {
 		},
 		deleteChild(stopReasonId) {
 			this.$confirm({
-				title: "Delete Confirmation",
-				text: "Do you want to delete this stop reason completly?\nThis will cause data loss when displaying graphs!",
+				title: this.$t("beacon.stop-reason.action.delete.confirm.title"),
+				text: this.$t("beacon.stop-reason.action.delete.confirm.text"),
 			})
 				.then(() => {
 					this.loading = true;

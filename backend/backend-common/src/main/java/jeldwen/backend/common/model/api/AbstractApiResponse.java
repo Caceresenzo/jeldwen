@@ -1,35 +1,31 @@
 package jeldwen.backend.common.model.api;
 
-import java.time.LocalDateTime;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
+@JsonPropertyOrder({ "status", "metadata" })
 public abstract class AbstractApiResponse {
 
 	/* Variables */
-	private HttpStatus status;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-	private LocalDateTime timestamp;
+	@JsonIgnore
+	private HttpStatus httpStatus;
+	
+	@JsonInclude(Include.NON_NULL)
 	private Object metadata;
 
 	/* Constructor */
-	private AbstractApiResponse() {
-		this.timestamp = LocalDateTime.now();
-	}
-
-	/* Constructor */
 	public AbstractApiResponse(HttpStatus status) {
-		this();
-		
-		this.status = status;
+		this.httpStatus = status;
 	}
 
 	/* Constructor */
@@ -39,8 +35,12 @@ public abstract class AbstractApiResponse {
 		this.metadata = metadata;
 	}
 	
+	public String getStatus() {
+		return httpStatus.getReasonPhrase();
+	}
+	
 	public ResponseEntity<? extends AbstractApiResponse> toResponseEntity() {
-		return new ResponseEntity<>(this, status);
+		return new ResponseEntity<>(this, httpStatus);
 	}
 	
 }

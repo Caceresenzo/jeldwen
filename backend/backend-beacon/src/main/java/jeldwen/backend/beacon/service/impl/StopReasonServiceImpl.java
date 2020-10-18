@@ -38,7 +38,7 @@ import jeldwen.backend.common.util.TypeAwareMapper;
 public class StopReasonServiceImpl implements IStopReasonService {
 	
 	@Autowired
-	private StopReasonRepository stopReasonRepository;
+	private StopReasonRepository repository;
 	
 	@Autowired
 	private StopReasonGroupRepository stopReasonGroupRepository;
@@ -56,24 +56,24 @@ public class StopReasonServiceImpl implements IStopReasonService {
 	private IBeaconService beaconService;
 	
 	/* Mappers */
-	private final TypeAwareMapper<StopReason, SimpleStopReasonDescriptor> simpleStopReasonDescriptorMapper;
+	private final TypeAwareMapper<StopReason, SimpleStopReasonDescriptor> mapper;
 	
 	/* Constructor */
 	public StopReasonServiceImpl() {
-		this.simpleStopReasonDescriptorMapper = new TypeAwareMapper<StopReason, SimpleStopReasonDescriptor>() {
+		this.mapper = new TypeAwareMapper<StopReason, SimpleStopReasonDescriptor>() {
 		};
 		
-		simpleStopReasonDescriptorMapper.getWrappedModelMapper().getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		mapper.getWrappedModelMapper().getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 	}
 	
 	@Override
 	public List<SimpleStopReasonDescriptor> listAll() {
-		return simpleStopReasonDescriptorMapper.toDtos(stopReasonRepository.findAll());
+		return mapper.toDtos(repository.findAll());
 	}
 	
 	@Override
 	public StopReason find(long id) {
-		return stopReasonRepository.findById(id).orElse(null);
+		return repository.findById(id).orElse(null);
 	}
 	
 	@Override
@@ -81,12 +81,12 @@ public class StopReasonServiceImpl implements IStopReasonService {
 		List<StopReason> stopReasons;
 		
 		if (ignoreParent) {
-			stopReasons = stopReasonRepository.findAll();
+			stopReasons = repository.findAll();
 		} else {
 			stopReasons = new ArrayList<>();
 			
 			if (includeFree) {
-				stopReasons.addAll(stopReasonRepository.findAllByGroupIsNullAndBeaconIsNull());
+				stopReasons.addAll(repository.findAllByGroupIsNullAndBeaconIsNull());
 			}
 			
 			if (includeParent != null && parentId != null) {
@@ -94,19 +94,19 @@ public class StopReasonServiceImpl implements IStopReasonService {
 					Beacon beacon = beaconService.find(parentId);
 					
 					if (beacon != null) {
-						stopReasons.addAll(stopReasonRepository.findAllByBeaconIs(beacon));
+						stopReasons.addAll(repository.findAllByBeaconIs(beacon));
 					}
 				} else if (Inclusion.GROUP.equals(includeParent)) {
 					StopReasonGroup group = stopReasonGroupService.find(parentId);
 					
 					if (group != null) {
-						stopReasons.addAll(stopReasonRepository.findAllByGroupIs(group));
+						stopReasons.addAll(repository.findAllByGroupIs(group));
 					}
 				}
 			}
 		}
 		
-		return simpleStopReasonDescriptorMapper.toDtos(stopReasons);
+		return mapper.toDtos(stopReasons);
 	}
 	
 	@Override
@@ -133,7 +133,7 @@ public class StopReasonServiceImpl implements IStopReasonService {
 	
 	@Override
 	public List<StopReason> listAllByIds(List<Long> ids) {
-		return stopReasonRepository.findAllById(ids);
+		return repository.findAllById(ids);
 	}
 	
 	@Override
@@ -144,14 +144,14 @@ public class StopReasonServiceImpl implements IStopReasonService {
 			throw new EntityNotFoundException();
 		}
 		
-		return stopReasonRepository.save(new StopReason()
+		return repository.save(new StopReason()
 				.setName(body.getName())
 				.setCategory(category));
 	}
 	
 	@Override
 	public StopReason update(long id, StopReasonUpdateBody body) {
-		Optional<StopReason> optional = stopReasonRepository.findById(id);
+		Optional<StopReason> optional = repository.findById(id);
 		
 		if (optional.isPresent()) {
 			StopReasonCategory category = stopReasonCategoryService.find(body.getCategoryId());
@@ -160,7 +160,7 @@ public class StopReasonServiceImpl implements IStopReasonService {
 				throw new EntityNotFoundException();
 			}
 			
-			return stopReasonRepository.save(optional.get()
+			return repository.save(optional.get()
 					.setName(body.getName())
 					.setCategory(category));
 		}
@@ -170,7 +170,7 @@ public class StopReasonServiceImpl implements IStopReasonService {
 	
 	@Override
 	public StopReason ungroup(long id) {
-		Optional<StopReason> optional = stopReasonRepository.findById(id);
+		Optional<StopReason> optional = repository.findById(id);
 		
 		if (optional.isPresent()) {
 			StopReason stopReason = optional.get();
@@ -180,7 +180,7 @@ public class StopReasonServiceImpl implements IStopReasonService {
 				group.getChildren().remove(stopReason);
 				
 				stopReasonGroupRepository.save(group);
-				return stopReasonRepository.save(stopReason.setGroup(null));
+				return repository.save(stopReason.setGroup(null));
 			}
 		}
 		
@@ -222,7 +222,7 @@ public class StopReasonServiceImpl implements IStopReasonService {
 			}
 			
 			kept = stopReasons.stream()
-					.map((child) -> stopReasonRepository.save(child.setGroup(null)))
+					.map((child) -> repository.save(child.setGroup(null)))
 					.collect(Collectors.toSet());
 		} else {
 			kept = stopReasons.stream()
@@ -248,13 +248,13 @@ public class StopReasonServiceImpl implements IStopReasonService {
 				
 				repository.save(parent);
 				
-				reasons.forEach((stopReason) -> stopReasonRepository.save(stopReason.setParent(null)));
+				reasons.forEach((stopReason) -> repository.save(stopReason.setParent(null)));
 			}
 		}
 		
 		return kept.stream()
 				.map((stopReason) -> stopReason.setParent(toParent))
-				.map(stopReasonRepository::save)
+				.map(repository::save)
 				.collect(Collectors.toSet());
 	}
 	
@@ -267,6 +267,16 @@ public class StopReasonServiceImpl implements IStopReasonService {
 		} else {
 			throw new IllegalStateException("unsupported model class: " + clazz);
 		}
+	}
+	
+	@Override
+	public TypeAwareMapper<StopReason, SimpleStopReasonDescriptor> getMapper() {
+		return mapper;
+	}
+	
+	@Override
+	public JpaRepository<StopReason, Long> getRepository() {
+		return repository;
 	}
 	
 }

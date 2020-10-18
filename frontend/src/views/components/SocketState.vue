@@ -1,29 +1,40 @@
 <template>
-	<v-btn :color="color" v-text="message">CONNECTED</v-btn>
+	<div>
+		<slot :message="message" :color="color">
+			<v-btn :color="color" v-text="message" depressed />
+		</slot>
+	</div>
 </template>
 <script>
 export default {
 	name: "socket-state",
 	data: () => ({
-		message: "WAITING",
+		state: "waiting",
 		color: "warning",
 	}),
+	computed: {
+		message() {
+			return this.$t(`socket.state.${this.state}`);
+		}
+	},
 	methods: {
 		onSocketConnect() {
-			this.message = "CONNECTING...";
+			this.state = "connecting";
 			this.color = "warning";
 		},
 		onSocketOpen() {
-			this.message = "CONNECTED";
+			this.state = "connected";
 			this.color = "success";
 		},
-		onSocketClose() {
-			this.message = "NOT CONNECTED";
+		onSocketError(error) {
+			this.state = "error";
 			this.color = "error";
 		},
-		onSocketError(error) {
-			this.message = "ERROR: " + error;
-			this.color = "error";
+		onSocketClose(event) {
+			if (this.state !== "error") {
+				this.state = "close";
+				this.color = "error";
+			}
 		},
 	},
 };

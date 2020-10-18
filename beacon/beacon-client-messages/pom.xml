@@ -12,6 +12,10 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.greenrobot</groupId>
 			<artifactId>eventbus</artifactId>
 			<version>3.2.0</version>

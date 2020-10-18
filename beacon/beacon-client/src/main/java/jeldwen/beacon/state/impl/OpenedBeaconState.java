@@ -3,15 +3,21 @@ package jeldwen.beacon.state.impl;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import jeldwen.beacon.entity.HourPerHour;
 import jeldwen.beacon.message.model.config.BeaconConfig;
 import jeldwen.beacon.message.model.config.ProductFamilyConfig;
 import jeldwen.beacon.message.model.config.StopReasonConfig;
 import jeldwen.beacon.service.IBeaconService;
+import jeldwen.beacon.service.IStopReasonService;
 import jeldwen.beacon.state.IBeaconState;
 import jeldwen.beacon.util.Utility;
 
 public class OpenedBeaconState implements IBeaconState {
+	
+	@Autowired
+	private IStopReasonService stopReasonService;
 	
 	/* Variables */
 	private ProductFamilyConfig activeProductFamily;
@@ -67,7 +73,9 @@ public class OpenedBeaconState implements IBeaconState {
 	@Override
 	public boolean reportStopReason(IBeaconService service, StopReasonConfig stopReason) {
 		if (stopReason != null) {
-			resetLast(); // TODO Implement buffering and flushing
+			stopReasonService.reportNow(stopReason, activeProductFamily, getSeconds());
+			
+			resetLast();
 			
 			service.notifyState();
 			

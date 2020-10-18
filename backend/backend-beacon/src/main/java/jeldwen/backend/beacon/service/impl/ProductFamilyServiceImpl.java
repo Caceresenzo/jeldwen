@@ -1,10 +1,10 @@
 package jeldwen.backend.beacon.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import jeldwen.backend.beacon.dto.ProductFamilyUpdateBody;
@@ -18,44 +18,30 @@ import jeldwen.backend.common.util.TypeAwareMapper;
 public class ProductFamilyServiceImpl implements IProductFamilyService {
 	
 	@Autowired
-	private ProductFamilyRepository productFamilyRepository;
+	private ProductFamilyRepository repository;
 	
 	/* Mappers */
-	private final TypeAwareMapper<ProductFamily, SimpleProductFamilyDescriptor> simpleProductFamilyDescriptorMapper;
+	private final TypeAwareMapper<ProductFamily, SimpleProductFamilyDescriptor> mapper;
 	
+	/* Constructor */
 	public ProductFamilyServiceImpl() {
-		this.simpleProductFamilyDescriptorMapper = new TypeAwareMapper<ProductFamily, SimpleProductFamilyDescriptor>() {
+		this.mapper = new TypeAwareMapper<ProductFamily, SimpleProductFamilyDescriptor>() {
 		};
 	}
 	
 	@Override
-	public List<SimpleProductFamilyDescriptor> listAll() {
-		return simpleProductFamilyDescriptorMapper.toDtos(productFamilyRepository.findAll());
-	}
-	
-	@Override
-	public ProductFamily find(long id) {
-		return productFamilyRepository.findById(id).orElse(null);
-	}
-	
-	@Override
-	public List<ProductFamily> listAllByIds(List<Long> ids) {
-		return productFamilyRepository.findAllById(ids);
-	}
-	
-	@Override
 	public ProductFamily create(ProductFamilyUpdateBody body) {
-		return productFamilyRepository.save(new ProductFamily()
+		return repository.save(new ProductFamily()
 				.setName(body.getName())
 				.setCycleTime(body.getCycleTime()));
 	}
 	
 	@Override
 	public ProductFamily update(long id, ProductFamilyUpdateBody body) {
-		Optional<ProductFamily> optional = productFamilyRepository.findById(id);
+		Optional<ProductFamily> optional = repository.findById(id);
 		
 		if (optional.isPresent()) {
-			return productFamilyRepository.save(optional.get()
+			return repository.save(optional.get()
 					.setName(body.getName())
 					.setCycleTime(body.getCycleTime()));
 		}
@@ -66,6 +52,16 @@ public class ProductFamilyServiceImpl implements IProductFamilyService {
 	@Override
 	public ProductFamily delete(long id) {
 		throw new NotYetImplementedException();
+	}
+	
+	@Override
+	public TypeAwareMapper<ProductFamily, SimpleProductFamilyDescriptor> getMapper() {
+		return mapper;
+	}
+	
+	@Override
+	public JpaRepository<ProductFamily, Long> getRepository() {
+		return repository;
 	}
 	
 }

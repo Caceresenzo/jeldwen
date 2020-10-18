@@ -7,12 +7,12 @@ import javax.annotation.PostConstruct;
 import org.greenrobot.eventbus.Subscribe;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import jeldwen.beacon.entity.HourPerHour;
 import jeldwen.beacon.message.model.IBeaconMessage;
-import jeldwen.beacon.message.model.config.BeaconConfig;
 import jeldwen.beacon.message.model.config.ProductFamilyConfig;
 import jeldwen.beacon.message.model.message.event.impl.rhythm.RhythmSyncEventMessage;
 import jeldwen.beacon.message.model.message.request.impl.productfamily.FamilyChangeRequest;
@@ -27,6 +27,7 @@ import jeldwen.beacon.message.model.message.response.impl.workstation.Workstatio
 import jeldwen.beacon.message.service.IBeaconMessageService;
 import jeldwen.beacon.model.event.SocketConnectedEvent;
 import jeldwen.beacon.service.IBeaconService;
+import jeldwen.beacon.service.IConfigService;
 import jeldwen.beacon.service.IGraphicalUserInterfaceService;
 import jeldwen.beacon.service.IHourPerHourService;
 import jeldwen.beacon.state.IBeaconState;
@@ -46,13 +47,19 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 	@Autowired
 	private IHourPerHourService hourPerHourService;
 	
+	@Autowired
+	private AutowireCapableBeanFactory beanFactory;
+	
+	@Autowired
+	private IConfigService configService;
+	
 	/* Variables */
 	private IBeaconState state;
-	private BeaconConfig beaconConfig;
 	
 	@PostConstruct
 	private void initialize() {
 		setState(new OpenedBeaconState());
+		
 		
 		beaconMessageService.register(this);
 	}
@@ -71,7 +78,8 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 		}
 		
 		state = newState;
-		state.start(this, beaconConfig, hourPerHour());
+		beanFactory.autowireBean(state);
+		state.start(this, configService.current(), hourPerHour());
 		notifyState();
 		
 		log.info("Changed state: {}", state.getName());
@@ -113,7 +121,7 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 	public void notifyState(boolean includeHistory) {
 		graphicalUserInterfaceService.notify(new WorkstationStateResponse()
 				.setOpened(state.isOpen(this))
-				.setBeaconConfig(beaconConfig)
+				.setBeaconConfig(configService.current())
 				.setActiveFamilyId(state.getActiveProductFamily())
 				.setSeconds(state.getSeconds())
 				.setCurrentHourPerHour(hourPerHourService.currentDescriptor())
@@ -141,9 +149,7 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 	@Subscribe
 	public void onConfig(ConfigResponseMessage request) {
 		if (request.isSuccess()) {
-			beaconConfig = request.getBeaconConfig();
-			
-			if (state.onNewConfig(this, beaconConfig)) {
+			if (state.onNewConfig(this, configService.current())) {
 				notifyState();
 			}
 		}
@@ -170,7 +176,7 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 			return;
 		}
 		
-		ProductFamilyConfig productFamily = beaconConfig.findProductFamily(request.getFamilyId());
+		ProductFamilyConfig productFamily = configService.current().findProductFamily(request.getFamilyId());
 		
 		if (state.changeProductFamily(this, productFamily)) {
 			graphicalUserInterfaceService.notify(FamilyChangedResponse.of(productFamily));
@@ -186,7 +192,7 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 		}
 		
 		graphicalUserInterfaceService.notify(new ReportedResponse()
-				.setSuccess(state.reportStopReason(this, beaconConfig.findStopReason(request.getStopReasonId()))));
+				.setSuccess(state.reportStopReason(this, configService.current().findStopReason(request.getStopReasonId()))));
 	}
 	
 	@Subscribe
@@ -201,7 +207,7 @@ public class BeaconServiceImpl implements IBeaconService, DisposableBean {
 	}
 	
 	private boolean isOpenAndConfigured() {
-		return state.isOpen(this) && beaconConfig != null;
+		return state.isOpen(this) && configService.current() != null;
 	}
 	
 	private HourPerHour hourPerHour() {

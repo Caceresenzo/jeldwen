@@ -12,8 +12,8 @@
 					<v-btn text color="error" v-show="error" :disabled="loading" @click="put()">{{ error }}</v-btn>
 					<v-spacer></v-spacer>
 					<slot name="actions" v-bind:loading="loading" v-bind:error="error" />
-					<v-btn text color="primary" :disabled="loading" @click="close()">Close</v-btn>
-					<v-btn text color="primary" :disabled="loading" @click="put()">{{ edit ? "EDIT" : "CREATE" }}</v-btn>
+					<v-btn text color="primary" :disabled="loading" @click="close()">{{ $t("common.close") }}</v-btn>
+					<v-btn text color="primary" :disabled="loading" @click="put()">{{ $t("common." + (edit ? "edit" : "create")) }}</v-btn>
 				</v-card-actions>
 			</v-card>
 			<slot name="other" />

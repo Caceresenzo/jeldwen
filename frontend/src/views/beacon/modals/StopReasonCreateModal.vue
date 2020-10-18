@@ -3,11 +3,11 @@
 		<template v-slot="{ loading }">
 			<v-list>
 				<v-list-item>
-					<v-text-field v-model="inputs.name" :disabled="loading" label="Name*" required></v-text-field>
+					<v-text-field v-model="inputs.name" :disabled="loading" :label="$t('common.fields.name')" required></v-text-field>
 				</v-list-item>
 				<v-list-item>
 					<v-list-item-content>
-						<v-select label="Category*" v-model="inputs.categoryId" :items="items.categories" item-text="name" item-value="id" :loading="dependencyLoading"></v-select>
+						<v-select v-model="inputs.categoryId" :label="$t('common.fields.category')" :items="items.categories" item-text="name" item-value="id" :loading="dependencyLoading"></v-select>
 					</v-list-item-content>
 					<v-list-item-avatar>
 						<v-icon @click="openStopReasonCategoryCreateModal()">mdi-plus</v-icon>

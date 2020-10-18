@@ -9,7 +9,7 @@
 					<v-list v-if="beacon" class="py-0">
 						<v-list-item @click>
 							<v-list-item-content>
-								<v-list-item-title>Connection</v-list-item-title>
+								<v-list-item-title>{{ $t("beacon.connection") }}</v-list-item-title>
 								<v-list-item-subtitle v-text="beacon.unique" />
 							</v-list-item-content>
 							<v-list-item-avatar>
@@ -17,14 +17,14 @@
 							</v-list-item-avatar>
 						</v-list-item>
 						<v-list-item v-if="configured" @click>
-							<v-list-item-content>Synthetic Performance Rate Threshold</v-list-item-content>
+							<v-list-item-content>{{ $t("beacon.synthetic-performance-rate-threshold") }}</v-list-item-content>
 							<v-list-item-avatar v-text="beacon.syntheticPerformanceRateThreshold * 100 + '%'"></v-list-item-avatar>
 						</v-list-item>
 					</v-list>
 					<div v-if="beacon && configured">
 						<v-divider></v-divider>
 						<v-list subheader class="py-0">
-							<v-subheader>Product Families</v-subheader>
+							<v-subheader>{{ $t("beacon.product-family.plural") }}</v-subheader>
 							<v-list-item v-for="productFamily of beacon.productFamilies" :key="productFamily.id" @click>
 								<v-list-item-content v-text="productFamily.name"></v-list-item-content>
 								<v-list-item-avatar v-text="productFamily.cycleTime + 's'"></v-list-item-avatar>
@@ -33,18 +33,7 @@
 						</v-list>
 						<v-divider></v-divider>
 						<v-list subheader class="py-0">
-							<v-subheader>Stop Reason Groups</v-subheader>
-							<v-list-item v-for="stopReasonGroup of beacon.stopReasonGroups" :key="stopReasonGroup.id" @click="openStopReasonGroup(stopReasonGroup.id)">
-								<v-list-item-content>
-									<v-list-item-title v-text="stopReasonGroup.name" />
-									<v-list-item-subtitle v-text="stopReasonGroup.children.length + ' child(ren)'" />
-								</v-list-item-content>
-							</v-list-item>
-							<empty v-if="!beacon.stopReasonGroups.length" />
-						</v-list>
-						<v-divider></v-divider>
-						<v-list subheader class="py-0">
-							<v-subheader>Stop Reasons</v-subheader>
+							<v-subheader>{{ $t("beacon.stop-reason.plural") }}</v-subheader>
 							<stop-reason-by-categories class="mx-4" :items="(beacon || {}).stopReasons || []">
 								<template v-slot="{ category }">
 									<v-list>
@@ -57,37 +46,51 @@
 								</template>
 							</stop-reason-by-categories>
 						</v-list>
+						<v-divider></v-divider>
+						<v-list subheader class="py-0">
+							<v-subheader>{{ $t("beacon.stop-reason.group.plural") }}</v-subheader>
+							<v-list-item v-for="stopReasonGroup of beacon.stopReasonGroups" :key="stopReasonGroup.id" @click="openStopReasonGroup(stopReasonGroup.id)">
+								<v-list-item-content>
+									<v-list-item-title v-text="stopReasonGroup.name" />
+									<v-list-item-subtitle v-text="$tc('beacon.stop-reason.group.child-count', stopReasonGroup.children.length, { count: stopReasonGroup.children.length })" />
+								</v-list-item-content>
+							</v-list-item>
+							<empty v-if="!beacon.stopReasonGroups.length" />
+						</v-list>
 					</div>
 					<v-divider></v-divider>
 					<v-card-actions>
 						<v-btn v-if="error" text color="error" :disabled="loading" v-text="error" @click="refresh()"></v-btn>
 						<v-spacer></v-spacer>
-						<v-btn text color="primary" :disabled="loading" @click="edit()">EDIT</v-btn>
-						<v-btn text color="primary" :disabled="loading" @click="refresh()">REFRESH</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="edit()">{{ $t("common.edit") }}</v-btn>
+						<v-btn text color="primary" :disabled="loading" @click="refresh()">{{ $t("common.refresh") }}</v-btn>
 					</v-card-actions>
 				</v-card>
 			</v-col>
 			<v-col cols="12">
+				<beacon-stop-reason-graph-card :beaconId="id" />
+			</v-col>
+			<v-col cols="12">
 				<v-card :loading="loading">
-					<v-card-title>Action Zone</v-card-title>
+					<v-card-title>{{ $t("beacon.action-zone._") }}</v-card-title>
 					<v-divider></v-divider>
 					<v-list-item multiline>
 						<v-list-item-content>
-							<v-list-item-title>Force sensor trigger</v-list-item-title>
-							<v-list-item-subtitle>Fake a sensor trigger</v-list-item-subtitle>
+							<v-list-item-title>{{ $t("beacon.action-zone.force-trigger._") }}</v-list-item-title>
+							<v-list-item-subtitle>{{ $t("beacon.action-zone.force-trigger.description") }}</v-list-item-subtitle>
 						</v-list-item-content>
 						<v-list-item-icon>
-							<v-btn :disabled="!connected" color="warning" depressed @click="forceSensorTrigger">TRIGGER</v-btn>
+							<v-btn :disabled="!connected" color="warning" depressed @click="forceSensorTrigger">{{ $t("common.trigger") }}</v-btn>
 						</v-list-item-icon>
 					</v-list-item>
 					<v-divider />
 					<v-list-item multiline>
 						<v-list-item-content>
-							<v-list-item-title>Force configuration</v-list-item-title>
-							<v-list-item-subtitle>Don't wait the beacon to restart, push a configuration by force</v-list-item-subtitle>
+							<v-list-item-title>{{ $t("beacon.action-zone.force-config._") }}</v-list-item-title>
+							<v-list-item-subtitle>{{ $t("beacon.action-zone.force-config.description") }}</v-list-item-subtitle>
 						</v-list-item-content>
 						<v-list-item-icon>
-							<v-btn :disabled="!connected" color="warning" depressed @click="reconfigure">RECONFIGURE</v-btn>
+							<v-btn :disabled="!connected" color="warning" depressed @click="reconfigure">{{ $t("common.reconfigure") }}</v-btn>
 						</v-list-item-icon>
 					</v-list-item>
 				</v-card>
@@ -101,11 +104,13 @@ import beaconService from "@/service/beaconService";
 
 import BeaconConnectedState from "./components/BeaconConnectedState";
 import StopReasonByCategories from "./components/StopReasonByCategories";
+import BeaconStopReasonGraphCard from "./components/BeaconStopReasonGraphCard";
 
 export default {
 	components: {
 		BeaconConnectedState,
 		StopReasonByCategories,
+		BeaconStopReasonGraphCard,
 	},
 	data() {
 		return {
@@ -182,15 +187,11 @@ export default {
 							let success = response.data.payload;
 
 							if (success === null) {
-								this.$error(
-									"Reconfiguration failed: Beacon not found"
-								);
+								this.$error("Reconfiguration failed: Beacon not found");
 							} else if (success) {
 								this.$inform("Beacon reconfigured!");
 							} else {
-								this.$warn(
-									"Reconfiguration failed: Beacon not connected"
-								);
+								this.$warn("Reconfiguration failed: Beacon not connected");
 							}
 						})
 						.catch((error) => {
@@ -216,15 +217,11 @@ export default {
 							let success = response.data.payload;
 
 							if (success === null) {
-								this.$error(
-									"Trigger failed: Beacon not found"
-								);
+								this.$error("Trigger failed: Beacon not found");
 							} else if (success) {
 								this.$inform("Beacon's sensor triggered!");
 							} else {
-								this.$warn(
-									"Trigger failed: Beacon not connected"
-								);
+								this.$warn("Trigger failed: Beacon not connected");
 							}
 						})
 						.catch((error) => {

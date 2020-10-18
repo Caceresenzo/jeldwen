@@ -7,15 +7,23 @@
 						<v-icon>mdi-view-dashboard</v-icon>
 					</v-list-item-action>
 					<v-list-item-content>
-						<v-list-item-title>Dashboard</v-list-item-title>
+						<v-list-item-title>{{ $t("route.home") }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
 				<v-list-item link to="/beacons">
 					<v-list-item-action>
-						<v-icon>mdi-view-dashboard</v-icon>
+						<v-icon>mdi-car-light-high</v-icon>
 					</v-list-item-action>
 					<v-list-item-content>
-						<v-list-item-title>Beacons</v-list-item-title>
+						<v-list-item-title>{{ $t("route.beacons") }}</v-list-item-title>
+					</v-list-item-content>
+				</v-list-item>
+				<v-list-item link to="/settings">
+					<v-list-item-action>
+						<v-icon>mdi-cog</v-icon>
+					</v-list-item-action>
+					<v-list-item-content>
+						<v-list-item-title>{{ $t("route.settings") }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
 			</v-list>

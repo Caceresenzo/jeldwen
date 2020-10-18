@@ -3,7 +3,7 @@ package jeldwen.beacon.service;
 import java.util.List;
 
 import jeldwen.beacon.entity.HourPerHour;
-import jeldwen.beacon.message.model.descriptor.SimpleHourPerHourDescriptor;
+import jeldwen.beacon.model.descriptor.SimpleHourPerHourDescriptor;
 
 public interface IHourPerHourService {
 	
@@ -12,5 +12,7 @@ public interface IHourPerHourService {
 	SimpleHourPerHourDescriptor currentDescriptor();
 
 	List<SimpleHourPerHourDescriptor> history();
+	
+	void report();
 	
 }

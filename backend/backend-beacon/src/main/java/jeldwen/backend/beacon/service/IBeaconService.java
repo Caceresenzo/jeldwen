@@ -10,6 +10,8 @@ public interface IBeaconService extends IModelBasedService<Beacon, SimpleBeaconD
 	
 	boolean create(String unique);
 	
+	Beacon find(String unique);
+	
 	BeaconConfig getConfig(String unique);
 	
 	Boolean reconfigure(long id);

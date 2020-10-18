@@ -3,7 +3,7 @@
 		<template v-slot="{ loading }">
 			<v-row>
 				<v-col cols="12">
-					<v-text-field v-model="inputs.name" :disabled="loading" label="Name*" required></v-text-field>
+					<v-text-field v-model="inputs.name" :disabled="loading" :label="$t('common.fields.name')" required></v-text-field>
 				</v-col>
 				<v-col cols="12">
 					<v-color-picker v-model="inputs.color" :disabled="loading" hide-alpha hide-canvas class="ma-2" width="100%" dot-size="30"></v-color-picker>

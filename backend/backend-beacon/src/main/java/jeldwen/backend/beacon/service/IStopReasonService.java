@@ -18,9 +18,6 @@ public interface IStopReasonService extends IModelBasedService<StopReason, Simpl
 
 	StopReason ungroup(long id);
 
-	@Override
-	StopReason delete(long id);
-
 	Set<StopReason> saveAsParent(List<StopReason> stopReasons, StopReasonGroup group, CollisionResolution ifCollision);
 	
 	Set<StopReason> saveAsParent(List<StopReason> stopReasons, Beacon beacon, CollisionResolution ifCollision);

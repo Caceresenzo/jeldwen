@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import jeldwen.backend.beacon.dto.BeaconUpdateBody;
@@ -34,7 +35,7 @@ import jeldwen.beacon.message.model.config.StopReasonConfig;
 public class BeaconServiceImpl implements IBeaconService {
 	
 	@Autowired
-	private BeaconRepository beaconRepository;
+	private BeaconRepository repository;
 	
 	@Autowired
 	private IProductFamilyService productFamilyService;
@@ -49,21 +50,17 @@ public class BeaconServiceImpl implements IBeaconService {
 	private IBeaconClientService beaconClientService;
 	
 	/* Mappers */
-	private final TypeAwareMapper<Beacon, SimpleBeaconDescriptor> simpleBeaconDescriptorMapper;
-	
+	private final TypeAwareMapper<Beacon, SimpleBeaconDescriptor> mapper;
+
+	/* Constructor */
 	public BeaconServiceImpl() {
-		this.simpleBeaconDescriptorMapper = new TypeAwareMapper<Beacon, SimpleBeaconDescriptor>() {
+		this.mapper = new TypeAwareMapper<Beacon, SimpleBeaconDescriptor>() {
 		};
 	}
 	
 	@Override
-	public List<SimpleBeaconDescriptor> listAll() {
-		return simpleBeaconDescriptorMapper.toDtos(beaconRepository.findAll());
-	}
-	
-	@Override
-	public Beacon find(long id) {
-		return beaconRepository.findById(id).orElse(null);
+	public Beacon find(String unique) {
+		return repository.findByUnique(unique).orElse(null);
 	}
 	
 	@Override
@@ -73,21 +70,21 @@ public class BeaconServiceImpl implements IBeaconService {
 	
 	@Override
 	public boolean create(String unique) {
-		if (beaconRepository.existsByUnique(unique)) {
+		if (repository.existsByUnique(unique)) {
 			return false;
 		}
 		
-		return beaconRepository.save(new Beacon().setUnique(unique)) != null;
+		return repository.save(new Beacon().setUnique(unique)) != null;
 	}
 	
 	@Override
 	public Beacon update(long id, BeaconUpdateBody body) {
-		Optional<Beacon> optional = beaconRepository.findById(id);
+		Optional<Beacon> optional = repository.findById(id);
 		
 		if (optional.isPresent()) {
 			Beacon beacon = optional.get();
 			
-			return beaconRepository.save(beacon
+			return repository.save(beacon
 					.setName(body.getName())
 					.setProductFamilies(productFamilyService.listAllByIds(body.getProductFamilyIds()))
 					.setStopReasonGroups(stopReasonGroupService.listAllByIds(body.getStopReasonGroupIds()))
@@ -101,7 +98,7 @@ public class BeaconServiceImpl implements IBeaconService {
 	@Transactional
 	@Override
 	public BeaconConfig getConfig(String unique) {
-		Optional<Beacon> optional = beaconRepository.findByUnique(unique);
+		Optional<Beacon> optional = repository.findByUnique(unique);
 		
 		if (optional.isPresent()) {
 			Beacon beacon = optional.get();
@@ -160,6 +157,16 @@ public class BeaconServiceImpl implements IBeaconService {
 	}
 	
 	@Override
+	public TypeAwareMapper<Beacon, SimpleBeaconDescriptor> getMapper() {
+		return mapper;
+	}
+	
+	@Override
+	public JpaRepository<Beacon, Long> getRepository() {
+		return repository;
+	}
+	
+	@Override
 	public Boolean reconfigure(long id) {
 		return delegateToBeaconClientService(id, beaconClientService::reconfigure);
 	}
@@ -170,7 +177,7 @@ public class BeaconServiceImpl implements IBeaconService {
 	}
 	
 	private Boolean delegateToBeaconClientService(long id, Predicate<String> function) {
-		Optional<Beacon> optional = beaconRepository.findById(id);
+		Optional<Beacon> optional = repository.findById(id);
 		
 		if (optional.isPresent()) {
 			Beacon beacon = optional.get();

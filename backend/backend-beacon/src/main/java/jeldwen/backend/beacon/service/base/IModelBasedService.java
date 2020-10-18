@@ -2,18 +2,36 @@ package jeldwen.backend.beacon.service.base;
 
 import java.util.List;
 
-public interface IModelBasedService<M, D, B> {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import jeldwen.backend.common.util.TypeAwareMapper;
+
+public interface IModelBasedService<E, D, B> {
 	
-	List<D> listAll();
+	default List<D> listAll() {
+		return getMapper().toDtos(getRepository().findAll());
+	}
 	
-	M find(long id);
+	default E find(long id) {
+		return getRepository().findById(id).orElse(null);
+	}
 	
-	List<M> listAllByIds(List<Long> ids);
+	default List<E> listAllByIds(List<Long> ids) {
+		return getRepository().findAllById(ids);
+	}
 	
-	M create(B body);
+	E create(B body);
 	
-	M update(long id, B body);
+	E update(long id, B body);
 	
-	M delete(long id);
+	E delete(long id);
+	
+	default D toDto(E entity) {
+		return getMapper().toDto(entity);
+	}
+	
+	TypeAwareMapper<E, D> getMapper();
+	
+	JpaRepository<E, Long> getRepository();
 	
 }
