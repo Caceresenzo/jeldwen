@@ -7,8 +7,11 @@
 	- [API](#api)
 - [Front-end](#front-end)
 	- [Pages](#pages)
+	- [Internationalization](#internationalization)
+		- [Supported Languages](#supported-languages)
 - [Beacon](#beacon)
 	- [Authentication](#authentication)
+	- [Client](#client)
 	- [Operator View](#operator-view)
 - [Messages](#messages)
 	- [Events](#events)
@@ -23,6 +26,7 @@
 		- [request/workstation-close](#requestworkstation-close)
 		- [request/family-change](#requestfamily-change)
 		- [request/report](#requestreport)
+		- [request/stop-reason-report](#requeststop-reason-report)
 	- [Responses](#responses)
 		- [response/auth](#responseauth)
 		- [response/config](#responseconfig)
@@ -30,6 +34,7 @@
 		- [response/family-changed](#responsefamily-changed)
 		- [response/reported](#responsereported)
 		- [response/workstation-state](#responseworkstation-state)
+		- [response/reported-stop-reason](#responsereported-stop-reason)
 
 # Security
 
@@ -82,6 +87,22 @@ Running with Vue.js and Node.js.
 | /beacon/{id}/edit              | Beacon edition             |
 | /beacon/stop-reason/group/{id} | Stop reason group details  |
 
+## Internationalization
+
+Every page will have a full internationalization (or i18n for short) support to enable anyone to fully understand what going on.
+
+### Supported Languages
+
+| Short                         | Completeness  |
+| ----------------------------- | ------------- |
+| raw (remain to be translated) | ~80%          |
+| en                            | ~20%          |
+| fr                            | ~20%          |
+
+Usually both language are applied at the same time to avoid loosing time of what has been already translated and what is remaining. But to speed up developement process, language are only applied to module that are in a working state.
+
+Adding a language is a easy process: for every graphical interface, there is a file i18n.js contained in the /plugins/ directory. Just copy-paste one of the currently defined languages to add another one.
+
 # Beacon
 
 ## Authentication
@@ -89,6 +110,12 @@ Running with Vue.js and Node.js.
 A beacon authenticate itself by using the MAC address of the first physical network interface available by the hardware.
 
 Without being identified, the `back-end` will refuse any request/response/event coming from this unauthenticated connection. This is to ensure that a packet is not being randomly sent without knowing the origin.
+
+## Client
+
+The `beacon client` is running on a Raspberry Pi, allowing to wire sensors and access to a network. It will responsible to manage the current state of the graphical interface (a.k.a the operator view).
+
+Running with Spring Boot, it is connected to the `back-end` through a WebSocket, allowing for instant bi-directional communication. In case where the link is not connected or has been broken, the `beacon` must buffer the information that is has to send back to the `back-end`. Once the link is connected (or restored), the `beacon` must authenticate first and then flush his awaiting requests.
 
 ## Operator View
 
@@ -108,12 +135,14 @@ The operator view is a page where a person being can see exactly what is current
 | Request  | workstation-close     | Operator View 🡒 Beacon | Close a workstation                                  |
 | Request  | family-change         | Operator View 🡒 Beacon | Change the currently active family product           |
 | Request  | report                | Operator View 🡒 Beacon | Report a stop reason                                 |
+| Request  | stop-reason-report    | Beacon 🡒 Back-end      | Report a stop reason to the back-end                 |
 | Response | auth                  | Back-end 🡒 Beacon      | Confirm the authentication                           |
 | Response | config                | Back-end 🡒 Beacon      | Receive beacon's configuration                       |
 | Response | connected-beacon-list | Back-end 🡒 Front-end   | Get the list of connected beacon                     |
 | Response | family-changed        | Beacon 🡒 Operator View | Know when the product family has been changed        |
 | Response | reported              | Beacon 🡒 Operator View | Know when a report has been received by the beacon   |
 | Response | workstation-state     | Beacon 🡒 Operator View | Receive the full workstation's state                 |
+| Response | reported-stop-reason  | Back-end 🡒 Beacon      | Confirm stop reason report reception                 |
 
 ## Events
 
@@ -186,6 +215,19 @@ Report a stop reason and restart timings.
 |--------------|------|---------------------------------|
 | stopReasonId | Long | Target stop reason id to report |
 
+### request/stop-reason-report
+
+Report a stop reason the the `back-end`, it will be stored allowing for quick overview of previous performances. A confirm response will be sent back with the same `id` property.
+
+| Property        | Type     | Description                                                 |
+|-----------------|----------|-------------------------------------------------------------|
+| id              | Long     | Beacon's entry database's ID, will be used for confirmation |
+| stopReasonId    | Long     | Stop reason ID (can be null)                                |
+| message         | String   | Custom message for `other` reason                           |
+| productFamilyId | Long     | Product family ID                                           |
+| duration        | Long     | Duration of the stop in seconds                             |
+| at              | DateTime | Date and time of the event                                  |
+
 ## Responses
 
 Responses are usually answers to requests but can also provide initial data when you are not expecting them.
@@ -244,3 +286,11 @@ Sent by the `beacon`, the `operator view` will update views based on provided in
 | seconds            | Long                                    | The number of seconds since the start or the last sensor trigger                 |
 | currentHourPerHour | SimpleHourPerHourDescriptor             | Current hour per hour line data (including produced, objective, ...)             |
 | hourPerHourHistory | List&lt;SimpleHourPerHourDescriptor&gt; | History including previous hour per hour data (can be null to save up on memory) |
+
+### response/reported-stop-reason
+
+Confirm that a stop reason has successfully been reported to the `back-end`. The returned `id` will confirm the beacon that he can remove the local `id` of his buffered storage.
+
+| Property | Type | Description                            |
+|----------|------|----------------------------------------|
+| id       | Long | Confirmed beacon's entry database's ID |
