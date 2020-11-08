@@ -1,0 +1,9 @@
+secretGenerator:
+- name: mysql-passwords
+  literals:
+  - root=password
+resources:
+  - storage.yaml
+  - ingress.yaml
+  - mysql.yaml
+  - jw-glial.yaml

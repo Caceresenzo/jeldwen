@@ -4,6 +4,11 @@
 	<artifactId>jeldwen</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -22,15 +27,11 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<spring.boot.version>2.3.0.RELEASE</spring.boot.version>
-	</properties>
 	<modules>
 		<module>backend</module>
 		<module>beacon</module>
 		<module>frontend</module>
 		<module>socket</module>
+		<module>glial</module>
 	</modules>
 </project>

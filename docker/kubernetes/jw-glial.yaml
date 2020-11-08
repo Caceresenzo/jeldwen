@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jw-glial
+  labels:
+    app: jw-glial
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jw-glial
+  template:
+    metadata:
+      labels:
+        app: jw-glial
+    spec:
+      containers:
+      - name: jw-glial
+        image: jeldwen-glial
+        imagePullPolicy: Never
+        env:
+          - name: DATABASE_NAME
+            value: glial_2
+          - name: DATABASE_HOST
+            value: mysql
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-passwords
+                key: root
+        ports:
+        - containerPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: jw-glial
+  labels:
+    app: jw-glial
+spec:
+  ports:
+    - name: jw-glial-http
+      port: 80
+  selector:
+    app: jw-glial
+  type: NodePort
