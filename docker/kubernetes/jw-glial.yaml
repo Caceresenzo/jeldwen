@@ -36,6 +36,8 @@ kind: Service
 apiVersion: v1
 metadata:
   name: jw-glial
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared-ip
   labels:
     app: jw-glial
 spec:
@@ -44,4 +46,4 @@ spec:
       port: 80
   selector:
     app: jw-glial
-  type: NodePort
+  type: LoadBalancer
