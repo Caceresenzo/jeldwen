@@ -6,6 +6,7 @@ metadata:
     app: mysql
 spec:
   replicas: 1
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: mysql
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:5.7.32
+          image: bind0000-mysql
           env:
             - name: MYSQL_ROOT_HOST
               value: "%"
