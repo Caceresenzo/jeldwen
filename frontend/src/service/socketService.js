@@ -1,5 +1,7 @@
 import EventEmitter from 'events'
 
+import application from '../../application'
+
 class SocketService extends EventEmitter {
 
 	start() {
@@ -12,7 +14,7 @@ class SocketService extends EventEmitter {
 	}
 
 	connect() {
-		this.ws = new WebSocket("ws://localhost:5700");
+		this.ws = new WebSocket(application.webSocket.url);
 
 		this.onSocketConnect();
 
