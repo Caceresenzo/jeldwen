@@ -1,5 +1,5 @@
 export default {
 	api: {
-		baseUrl: "http://localhost:8000/"
+		baseUrl: window.location.origin + "/api/"
 	},
 };

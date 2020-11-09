@@ -10,20 +10,23 @@
 						<v-list-item-title>{{ $t("route.home") }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
+				<v-subheader>{{ $t("route.beacons._") }}</v-subheader>
 				<v-list-item link to="/beacons">
 					<v-list-item-action>
 						<v-icon>mdi-car-light-high</v-icon>
 					</v-list-item-action>
 					<v-list-item-content>
-						<v-list-item-title>{{ $t("route.beacons") }}</v-list-item-title>
+						<v-list-item-title>{{ $t("route.beacons.editor") }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
+				<glial-machine-list />
+				<v-subheader>{{ $t("route.others._") }}</v-subheader>
 				<v-list-item link to="/settings">
 					<v-list-item-action>
 						<v-icon>mdi-cog</v-icon>
 					</v-list-item-action>
 					<v-list-item-content>
-						<v-list-item-title>{{ $t("route.settings") }}</v-list-item-title>
+						<v-list-item-title>{{ $t("route.others.settings") }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
 			</v-list>
@@ -49,23 +52,21 @@
 </template>
 
 <script>
-import Vue from "vue";
-
 import SocketState from "./views/components/SocketState";
+import GlialMachineList from "./views/glial/MachineList";
 
 export default {
 	components: {
 		SocketState,
+		GlialMachineList
 	},
 	name: "App",
 	data: () => ({
 		drawer: null,
 	}),
-	created() {
-		// this.$vuetify.theme.dark = true;
-	},
 	mounted() {
 		this.$socket.start();
+		this.$store.dispatch("glial/machine/fetch");
 	},
 };
 </script>

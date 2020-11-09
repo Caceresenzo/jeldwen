@@ -74,6 +74,7 @@
 	<modules>
 		<module>backend-common</module>
 		<module>backend-beacon</module>
+		<module>backend-glial</module>
 		<module>backend-core</module>
 	</modules>
 </project>

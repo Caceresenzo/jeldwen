@@ -32,6 +32,5 @@
 		<module>beacon</module>
 		<module>frontend</module>
 		<module>socket</module>
-		<module>glial</module>
 	</modules>
 </project>

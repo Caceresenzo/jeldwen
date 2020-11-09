@@ -11,8 +11,18 @@ let messages = {
 		version: `JELDWEN v${application.version}`,
 		route: {
 			home: "Home",
-			beacons: "Beacons",
-			settings: "Settings",
+			beacons: {
+				_: "BEACONS",
+				editor: "Editor"
+			},
+			"glial-machines": {
+				_: "MACHINES GLIAL",
+				overview: "Overview",
+			},
+			others: {
+				_: "OTHERS",
+				settings: "Settings",
+			},
 		},
 		common: {
 			edit: "EDIT",
@@ -87,6 +97,30 @@ let messages = {
 				}
 			}
 		},
+		glial: {
+			machines: {
+				selector: {
+					at: "At"
+				},
+				card: {
+					percent: "produced/objective",
+					csv: "csv",
+					delete: "delete"
+				},
+				fields: {
+					yellowStop: "Yellow stop",
+					orangeStop: "Orange stop",
+					pinkStop: "Pink stop",
+					greenStop: "Green stop",
+					blueStop: "Blue stop",
+					otherStop: "Other stop",
+					totalStop: "Total stop",
+					nonQualifiedStop: "Non-Qualified stop",
+					objective: "Objective",
+					produced: "Produced",
+				}
+			},
+		},
 		settings: {
 			general: {
 				_: "General",
@@ -99,9 +133,19 @@ let messages = {
 		name: "Français",
 		version: `JELDWEN v${application.version}`,
 		route: {
-			home: "Acceuil",
-			beacons: "Balises",
-			settings: "Paramètres",
+			home: "Home",
+			beacons: {
+				_: "BALISES",
+				editor: "Éditeur"
+			},
+			"glial-machines": {
+				_: "MACHINES GLIAL",
+				overview: "Vu d'ensemble",
+			},
+			others: {
+				_: "AUTRES",
+				settings: "Paramètres",
+			},
 		},
 		common: {
 			edit: "ÉDITER",
@@ -175,6 +219,30 @@ let messages = {
 					description: "N'attendez pas que la balise redémarre, poussez une configuration par la force",
 				}
 			}
+		},
+		glial: {
+			machines: {
+				selector: {
+					at: "À"
+				},
+				card: {
+					percent: "produit/objectif",
+					csv: "csv",
+					delete: "supprimer"
+				},
+				fields: {
+					yellowStop: "Arret jaune",
+					orangeStop: "Arret orange",
+					pinkStop: "Arret rose",
+					greenStop: "Arret vert",
+					blueStop: "Arret blue",
+					otherStop: "Arret other",
+					totalStop: "Total arret",
+					nonQualifiedStop: "Arret non-qualifié",
+					objective: "Objectif",
+					produced: "Produit",
+				},
+			},
 		},
 		settings: {
 			general: {

@@ -18,6 +18,7 @@ spec:
       containers:
         - name: mysql
           image: bind0000-mysql
+          imagePullPolicy: Never
           env:
             - name: MYSQL_ROOT_HOST
               value: "%"
@@ -27,7 +28,7 @@ spec:
                   name: mysql-passwords
                   key: root
             - name: MYSQL_DATABASE
-              value: "glial_2"
+              value: "jeldwen"
           volumeMounts:
           - name: mysql-persistent-storage
             mountPath: /var/lib/mysql

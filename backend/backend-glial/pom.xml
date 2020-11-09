@@ -5,16 +5,11 @@
 		<artifactId>backend</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>backend-core</artifactId>
+	<artifactId>backend-glial</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>jeldwen</groupId>
-			<artifactId>backend-beacon</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>jeldwen</groupId>
-			<artifactId>backend-glial</artifactId>
+			<artifactId>backend-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -23,14 +18,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring.boot.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

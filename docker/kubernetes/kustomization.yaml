@@ -3,7 +3,6 @@ secretGenerator:
   literals:
   - root=password
 resources:
-  - storage.yaml
   - mysql.yaml
   - metallb.yaml
-  - jw-glial.yaml
+  - jeldwen.yaml
