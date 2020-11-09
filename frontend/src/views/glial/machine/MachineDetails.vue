@@ -17,7 +17,7 @@
 					<v-card-text class="text-center">
 						<small class="mb-2">{{ $t("glial.machines.card.csv") }}</small>
 						<br />
-						<v-btn icon :loading="loading" x-large color="green" :href="`http://localhost:8000/download/${machine}`" target="_blank">
+						<v-btn icon :loading="loading" x-large color="green" :href="downloadLink" target="_blank">
 							<v-icon>mdi-download</v-icon>
 						</v-btn>
 					</v-card-text>
@@ -72,6 +72,8 @@
 </template>
 
 <script>
+import application from "@/../application";
+
 const colors = ["#cbd600", "#F39C12", "#FF00FF", "#00FF00", "#0000FF", "#FFFFFF", "#FF0000", "#C0C0C0"];
 
 export default {
@@ -105,6 +107,9 @@ export default {
 			}
 
 			return (percent * 100).toFixed(0);
+		},
+		downloadLink() {
+			return `${application.api.baseUrl}/glial/download/${this.machine}`;
 		},
 		stopSeries() {
 			let names = ["yellowStop", "orangeStop", "pinkStop", "greenStop", "blueStop", "otherStop", "totalStop", "nonQualifiedStop"];
@@ -313,7 +318,7 @@ export default {
 				text: `This will delete data for the date: ${this.date}`,
 			})
 				.then(() => {
-					this.loading = true;
+					/*this.loading = true;
 
 					this.$http // TODO
 						.post(`/beacon/${this.id}/force-trigger`, {})
@@ -333,7 +338,7 @@ export default {
 						})
 						.then(() => {
 							this.loading = false;
-						});
+						});*/
 				})
 				.catch(() => {});
 		},
