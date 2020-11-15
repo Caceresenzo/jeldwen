@@ -1,0 +1,1 @@
+export default ["#cbd600", "#F39C12", "#FF00FF", "#00FF00", "#0000FF", "#FFFFFF", "#FF0000", "#C0C0C0"];

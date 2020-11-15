@@ -118,6 +118,10 @@ let messages = {
 					nonQualifiedStop: "Non-Qualified stop",
 					objective: "Objective",
 					produced: "Produced",
+				},
+				tooltips: {
+					seconds: "second | second | seconds",
+					times: "time | time | times",
 				}
 			},
 		},
@@ -242,6 +246,10 @@ let messages = {
 					objective: "Objectif",
 					produced: "Produit",
 				},
+				tooltips: {
+					seconds: "seconde | seconde | secondes",
+					times: "fois | fois | fois",
+				}
 			},
 		},
 		settings: {

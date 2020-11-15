@@ -31,6 +31,11 @@ const routes = [
 		component: () => import(/* webpackChunkName: "beacons" */ '../views/beacon/StopReasonGroupDetails.vue')
 	},
 	{
+		path: '/glial/overview',
+		name: 'Glial Machine Overview',
+		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachineDetails.vue')
+	},
+	{
 		path: '/glial/machine/:name',
 		name: 'Glial Machine Details',
 		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachineDetails.vue')

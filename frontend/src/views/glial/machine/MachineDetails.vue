@@ -1,38 +1,14 @@
 <template>
 	<v-container fluid>
 		<v-row>
-			<v-col cols="4">
-				<v-card>
-					<v-card-text class="text-center">
-						<small class="mb-2">{{ $t("glial.machines.card.percent") }}</small>
-						<br />
-						<v-btn icon :loading="loading" x-large color="blue" @click>
-							<h1>{{ percent }}%</h1>
-						</v-btn>
-					</v-card-text>
-				</v-card>
+			<v-col sm="4" cols="12">
+				<produced-objective-percent-card :entries="entries" :loading="loading" />
 			</v-col>
-			<v-col cols="4">
-				<v-card>
-					<v-card-text class="text-center">
-						<small class="mb-2">{{ $t("glial.machines.card.csv") }}</small>
-						<br />
-						<v-btn icon :loading="loading" x-large color="green" :href="downloadLink" target="_blank">
-							<v-icon>mdi-download</v-icon>
-						</v-btn>
-					</v-card-text>
-				</v-card>
+			<v-col sm="4" cols="6">
+				<download-card :machine="machine" :loading="loading" />
 			</v-col>
-			<v-col cols="4">
-				<v-card>
-					<v-card-text class="text-center">
-						<small class="mb-2">{{ $t("glial.machines.card.delete") }}</small>
-						<br />
-						<v-btn icon :loading="loading" x-large color="red" @click="confirmDelete()">
-							<v-icon>mdi-delete</v-icon>
-						</v-btn>
-					</v-card-text>
-				</v-card>
+			<v-col sm="4" cols="6">
+				<delete-card :machine="machine" :loading="loading" />
 			</v-col>
 			<v-col cols="12">
 				<v-card :loading="loading">
@@ -54,15 +30,15 @@
 					<v-divider />
 					<template v-if="entries.length">
 						<v-row>
-							<v-col cols="8">
-								<apexchart type="line" height="350" :options="stopChartOptions" :series="stopSeries"></apexchart>
+							<v-col sm="8" cols="12">
+								<stopped-seconds-by-color-graph :entries="entries" />
 							</v-col>
-							<v-col cols="4">
-								<apexchart type="pie" height="350" :options="stopPieChartOptions" :series="stopPieSeries"></apexchart>
+							<v-col sm="4" cols="12">
+								<stopped-seconds-by-color-pie :entries="entries" />
 							</v-col>
 						</v-row>
 						<v-divider />
-						<apexchart type="line" height="350" :options="percentChartOptions" :series="percentSeries"></apexchart>
+						<produced-objective-graph :entries="entries" />
 					</template>
 					<empty v-else />
 				</v-card>
@@ -72,12 +48,24 @@
 </template>
 
 <script>
-import application from "@/../application";
-
-const colors = ["#cbd600", "#F39C12", "#FF00FF", "#00FF00", "#0000FF", "#FFFFFF", "#FF0000", "#C0C0C0"];
+import ProducedObjectivePercentCard from "./components/ProducedObjectivePercentCard";
+import DownloadCard from "./components/DownloadCard";
+import DeleteCard from "./components/DeleteCard";
+import StoppedSecondsByColorGraph from "./components/StoppedSecondsByColorGraph";
+import StoppedSecondsByColorPie from "./components/StoppedSecondsByColorPie";
+import ProducedObjectiveGraph from "./components/ProducedObjectiveGraph";
+import colors from "./colors";
 
 export default {
 	name: "MachineDetails",
+	components: {
+		ProducedObjectivePercentCard,
+		DownloadCard,
+		DeleteCard,
+		StoppedSecondsByColorGraph,
+		StoppedSecondsByColorPie,
+		ProducedObjectiveGraph,
+	},
 	data: () => ({
 		entries: [],
 		dates: [],
@@ -89,182 +77,7 @@ export default {
 	}),
 	computed: {
 		machine() {
-			return this.$route.params.name;
-		},
-		percent() {
-			let produced = 0,
-				objective = 0;
-
-			for (let entry of this.entries) {
-				produced += entry.produced;
-				objective += entry.objective;
-			}
-
-			let percent = produced / objective;
-
-			if (isNaN(percent) || !isFinite(percent)) {
-				return "--";
-			}
-
-			return (percent * 100).toFixed(0);
-		},
-		downloadLink() {
-			return `${application.api.baseUrl}/glial/download/${this.machine}`;
-		},
-		stopSeries() {
-			let names = ["yellowStop", "orangeStop", "pinkStop", "greenStop", "blueStop", "otherStop", "totalStop", "nonQualifiedStop"];
-
-			let series = names.map((x) => ({
-				name: this.$t(`glial.machines.fields.${x}`),
-				data: [],
-			}));
-
-			for (let index in names) {
-				let name = names[index];
-				let serie = series[index];
-
-				for (let entry of this.entries) {
-					serie.data.push(entry[name]);
-				}
-			}
-
-			return series;
-		},
-		stopChartOptions() {
-			return {
-				chart: {
-					height: 350,
-					type: "line",
-					zoom: {
-						enabled: false,
-					},
-					background: this.$vuetify.theme.dark ? "#1E1E1E" : "#FFFFFF",
-					toolbar: {
-						show: false,
-					},
-				},
-				theme: {
-					mode: this.$vuetify.theme.dark ? "dark" : "light",
-				},
-				dataLabels: {
-					enabled: false,
-				},
-				stroke: {
-					curve: "smooth",
-				},
-				colors,
-				xaxis: {
-					categories: this.entries.map((x) => x.hour),
-					tooltip: {
-						enabled: false,
-					},
-				},
-				yaxis: {
-					tickAmount: 1,
-					labels: {
-						formatter(val) {
-							return `${val}s`;
-						},
-					},
-				},
-			};
-		},
-		stopPieSeries() {
-			let names = ["yellowStop", "orangeStop", "pinkStop", "greenStop", "blueStop", "otherStop"];
-
-			let series = names.map((x) => []);
-
-			for (let index in names) {
-				let name = names[index];
-				let serie = series[index];
-
-				for (let entry of this.entries) {
-					serie.push(entry[name]);
-				}
-			}
-
-			return series.map((x) => x.reduce((a, b) => a + b, 0));
-		},
-		stopPieChartOptions() {
-			return {
-				chart: {
-					height: 350,
-					type: "pie",
-					zoom: {
-						enabled: false,
-					},
-					background: this.$vuetify.theme.dark ? "#1E1E1E" : "#FFFFFF",
-					toolbar: {
-						show: false,
-					},
-				},
-				colors,
-				theme: {
-					mode: this.$vuetify.theme.dark ? "dark" : "light",
-				},
-				labels: ["yellowStop", "orangeStop", "pinkStop", "greenStop", "blueStop", "otherStop"].map((x) => this.$t(`glial.machines.fields.${x}`)),
-				legend: {
-					position: "bottom",
-				},
-			};
-		},
-		percentSeries() {
-			let names = ["objective", "produced"];
-
-			let series = names.map((x) => ({
-				name: this.$t(`glial.machines.fields.${x}`),
-				data: [],
-			}));
-
-			for (let index in names) {
-				let name = names[index];
-				let serie = series[index];
-
-				for (let entry of this.entries) {
-					serie.data.push(entry[name]);
-				}
-			}
-
-			return series;
-		},
-		percentChartOptions() {
-			return {
-				chart: {
-					height: 350,
-					type: "line",
-					zoom: {
-						enabled: false,
-					},
-					background: this.$vuetify.theme.dark ? "#1E1E1E" : "#FFFFFF",
-					toolbar: {
-						show: false,
-					},
-				},
-				theme: {
-					mode: this.$vuetify.theme.dark ? "dark" : "light",
-				},
-				dataLabels: {
-					enabled: false,
-				},
-				stroke: {
-					curve: "smooth",
-				},
-				colors: ["#F39C12", "#0000FF"],
-				xaxis: {
-					categories: this.entries.map((x) => x.hour),
-					tooltip: {
-						enabled: false,
-					},
-				},
-				yaxis: {
-					tickAmount: 1,
-					labels: {
-						formatter(val) {
-							return `${val}s`;
-						},
-					},
-				},
-			};
+			return this.$route.params.name || "";
 		},
 	},
 	watch: {
@@ -311,36 +124,6 @@ export default {
 				)
 				.catch((error) => (this.error = error))
 				.then(() => (this.loading = false));
-		},
-		confirmDelete() {
-			this.$confirm({
-				title: "Deletion confirmation",
-				text: `This will delete data for the date: ${this.date}`,
-			})
-				.then(() => {
-					/*this.loading = true;
-
-					this.$http // TODO
-						.post(`/beacon/${this.id}/force-trigger`, {})
-						.then((response) => {
-							let success = response.data.payload;
-
-							if (success === null) {
-								this.$error("Trigger failed: Beacon not found");
-							} else if (success) {
-								this.$inform("Beacon's sensor triggered!");
-							} else {
-								this.$warn("Trigger failed: Beacon not connected");
-							}
-						})
-						.catch((error) => {
-							this.error = error;
-						})
-						.then(() => {
-							this.loading = false;
-						});*/
-				})
-				.catch(() => {});
 		},
 	},
 	mounted() {
