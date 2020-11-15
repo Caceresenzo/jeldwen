@@ -38,31 +38,23 @@ public class BeaconExportServiceImpl implements BeaconExportService {
 	}
 	
 	@Override
-	public List<BeaconExport> list(LocalDate date) {
-		if (date != null) {
-			return repository.findAllByDate(date);
-		}
-		
-		return repository.findAll();
+	public List<BeaconExport> list(LocalDate date, Long lastNHour) {
+		return repository.findAll(date, lastNHour);
 	}
 	
 	@Override
-	public List<BeaconExport> list(LocalDate date, String machine) {
-		if (date != null) {
-			return repository.findAllByDateAndMachine(date, machine);
-		}
-		
-		return repository.findAllByMachine(machine);
+	public List<BeaconExport> list(LocalDate date, Long lastNHour, String machine) {
+		return repository.findAll(date, lastNHour, machine);
 	}
 	
 	@Override
-	public String csv(LocalDate date) {
-		return csv(list(date));
+	public String csv(LocalDate date, Long lastNHour) {
+		return csv(list(date, lastNHour));
 	}
 	
 	@Override
-	public String csv(LocalDate date, String machine) {
-		return csv(list(date, machine));
+	public String csv(LocalDate date, Long lastNHour, String machine) {
+		return csv(list(date, lastNHour, machine));
 	}
 	
 	@SneakyThrows

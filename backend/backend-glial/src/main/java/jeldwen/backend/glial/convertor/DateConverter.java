@@ -8,6 +8,12 @@ import javax.persistence.Converter;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link LocalDate} convertor for persistence.<br>
+ * Allowing Hibernete to understand the shitty dd/MM/yyyy date format.
+ * 
+ * @author Enzo CACERES
+ */
 @Converter
 @Component
 public class DateConverter implements AttributeConverter<LocalDate, String> {

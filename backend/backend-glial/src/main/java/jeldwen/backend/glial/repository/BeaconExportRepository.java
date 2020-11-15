@@ -8,8 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import jeldwen.backend.glial.entity.BeaconExport;
+import jeldwen.backend.glial.repository.custom.BeaconExportRepositoryCustom;
 
-public interface BeaconExportRepository extends JpaRepository<BeaconExport, Long> {
+public interface BeaconExportRepository extends JpaRepository<BeaconExport, Long>, BeaconExportRepositoryCustom {
 	
 	@Query("SELECT DISTINCT machine FROM BeaconExport") // TODO Unstable?
 	List<String> findDistinctMachine();

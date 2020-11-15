@@ -22,13 +22,13 @@ public class EntriesRestController {
 	private BeaconExportService beaconExportService;
 	
 	@GetMapping
-	public ResponseEntity<?> list(@RequestParam(required = false) LocalDate date) {
-		return new ApiAnwser<>(beaconExportService.list(date)).toResponseEntity();
+	public ResponseEntity<?> list(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) Long lastNHour) {
+		return new ApiAnwser<>(beaconExportService.list(date, lastNHour)).toResponseEntity();
 	}
 	
 	@GetMapping("{machine}")
-	public ResponseEntity<?> list(@PathVariable String machine, @RequestParam(required = false) LocalDate date) {
-		return new ApiAnwser<>(beaconExportService.list(date, machine)).toResponseEntity();
+	public ResponseEntity<?> list(@PathVariable String machine, @RequestParam(required = false) LocalDate date, @RequestParam(required = false) Long lastNHour) {
+		return new ApiAnwser<>(beaconExportService.list(date, lastNHour, machine)).toResponseEntity();
 	}
 	
 }

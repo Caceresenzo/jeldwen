@@ -5,7 +5,17 @@ import java.time.Duration;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+import org.springframework.stereotype.Component;
+
+/**
+ * {@link Duration} convertor for persistence.<br>
+ * Allowing Hibernete to understand the shitty HH:mm:ss duration format.<br>
+ * Since there is no way to property format and parse {@link Duration}, parsing is done through a split(':'); and then recomputed to reconstruct the {@link Duration} object.
+ * 
+ * @author Enzo CACERES
+ */
 @Converter
+@Component
 public class DurationConverter implements AttributeConverter<Duration, String> {
 	
 	/* Constants */
@@ -33,6 +43,13 @@ public class DurationConverter implements AttributeConverter<Duration, String> {
 		return Duration.ofSeconds((Long.parseLong(parts[0]) * 3600) + (Long.parseLong(parts[1]) * 60) + (Long.parseLong(parts[2])));
 	}
 	
+	/**
+	 * Pad the number to add a 0 if the number is less than 10.
+	 * 
+	 * @param n
+	 *            Number to pad.
+	 * @return Padded number.
+	 */
 	private String pad(long n) {
 		return (n < 10 ? "0" : "") + n;
 	}

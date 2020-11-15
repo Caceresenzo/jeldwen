@@ -2,6 +2,7 @@ package jeldwen.backend.glial.entity;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -22,11 +23,17 @@ import jeldwen.backend.glial.convertor.DurationConverter;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+/**
+ * Beacon export entity class.<br>
+ * Since I am 'forced' to adapt to what I am given, this class is flooded with custom converter and renaming. Which is not a problem really, but make everything ugly.
+ * 
+ * @author Enzo CACERES
+ */
 @Entity
 @Table(name = "export_balises_15min")
 @Data
 @Accessors(chain = true)
-@JsonPropertyOrder({"date", "hour", "machine", "produced", "objective", "yellowStop", "orangeStop", "pinkStop", "greenStop", "blueStop", "otherStop", "totalStop", "nonQualifiedStop"})
+@JsonPropertyOrder({ "date", "time", "machine", "produced", "objective", "yellowStop", "orangeStop", "pinkStop", "greenStop", "blueStop", "otherStop", "totalStop", "nonQualifiedStop" })
 public class BeaconExport {
 	
 	@Id
@@ -39,7 +46,7 @@ public class BeaconExport {
 	private LocalDate date;
 	
 	@Column(name = "Heure")
-	private LocalTime hour;
+	private LocalTime time;
 	
 	@Column(name = "Machine")
 	private String machine;
@@ -84,14 +91,20 @@ public class BeaconExport {
 	@Convert(converter = DurationConverter.class)
 	@JsonSerialize(using = DurationAsSecondsSerializer.class)
 	private Duration totalStop;
-
+	
+	/** @return The sum of all the stops, only and only if all of them are not <code>null</code>, in which case a <code>null</code> value is returned. The value cannot be below 0. */
 	@JsonSerialize(using = DurationAsSecondsSerializer.class)
 	public Duration getNonQualifiedStop() {
-		if (totalStop != null && yellowStop != null && orangeStop != null && pinkStop != null && greenStop != null && blueStop != null && otherStop != null) {			
+		if (totalStop != null && yellowStop != null && orangeStop != null && pinkStop != null && greenStop != null && blueStop != null && otherStop != null) {
 			return Duration.ofSeconds(Math.max(totalStop.minus(yellowStop.plus(orangeStop).plus(pinkStop).plus(greenStop).plus(blueStop).plus(otherStop)).getSeconds(), 0));
 		}
 		
 		return null;
+	}
+	
+	/** @return A {@link LocalDateTime} from the {@link LocalDate date} and {@link LocalTime time} of this beacon export. */
+	public LocalDateTime toLocalDateTime() {
+		return LocalDateTime.of(date, time);
 	}
 	
 }

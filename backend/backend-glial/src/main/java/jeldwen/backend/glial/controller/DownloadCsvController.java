@@ -23,18 +23,18 @@ public class DownloadCsvController {
 	
 	@GetMapping
 	@ResponseBody
-	public ResponseEntity<String> download(@RequestParam(required = false) LocalDate date) {
+	public ResponseEntity<String> download(@RequestParam(required = false) LocalDate date, @RequestParam(required = false) Long lastNHour) {
 		return ResponseEntity.ok()
 				.header("Content-Disposition", "attachment; filename=entries.csv")
-				.body(beaconExportService.csv(date));
+				.body(beaconExportService.csv(date, lastNHour));
 	}
 	
 	@GetMapping("{machine}")
 	@ResponseBody
-	public ResponseEntity<String> download(@PathVariable String machine, @RequestParam(required = false) LocalDate date) {
+	public ResponseEntity<String> download(@PathVariable String machine, @RequestParam(required = false) LocalDate date, @RequestParam(required = false) Long lastNHour) {
 		return ResponseEntity.ok()
 				.header("Content-Disposition", "attachment; filename=entries-" + machine + (date != null ? "-" + date : "") + ".csv")
-				.body(beaconExportService.csv(date, machine));
+				.body(beaconExportService.csv(date, lastNHour, machine));
 	}
 	
 }
