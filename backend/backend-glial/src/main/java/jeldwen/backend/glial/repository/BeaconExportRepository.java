@@ -27,4 +27,12 @@ public interface BeaconExportRepository extends JpaRepository<BeaconExport, Long
 	
 	List<BeaconExport> findAllByDateAndMachine(LocalDate date, String machine);
 	
+	long countByDateIn(List<LocalDate> dates);
+	
+	long countByDateInAndMachine(List<LocalDate> dates, String machine);
+	
+	void deleteAllByDateIn(List<LocalDate> dates);
+	
+	long deleteAllByDateInAndMachine(List<LocalDate> dates, String machine);
+	
 }

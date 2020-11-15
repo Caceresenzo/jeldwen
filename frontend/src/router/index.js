@@ -33,7 +33,7 @@ const routes = [
 	{
 		path: '/glial/overview',
 		name: 'Glial Machine Overview',
-		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachineDetails.vue')
+		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachinesOverview.vue')
 	},
 	{
 		path: '/glial/machine/:name',

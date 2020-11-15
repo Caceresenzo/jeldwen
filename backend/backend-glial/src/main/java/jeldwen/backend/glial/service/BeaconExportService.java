@@ -63,5 +63,13 @@ public interface BeaconExportService {
 	 * @return A formatted CSV.
 	 */
 	String csv(LocalDate date, Long lastNHour, String machine);
+
+	long previewDelete(List<LocalDate> dates);
+
+	long previewDelete(List<LocalDate> dates, String machine);
+
+	void delete(List<LocalDate> dates);
+
+	void delete(List<LocalDate> dates, String machine);
 	
 }

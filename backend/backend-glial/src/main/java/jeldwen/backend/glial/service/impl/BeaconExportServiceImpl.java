@@ -3,6 +3,8 @@ package jeldwen.backend.glial.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +62,28 @@ public class BeaconExportServiceImpl implements BeaconExportService {
 	@SneakyThrows
 	private String csv(List<BeaconExport> entries) {
 		return csvMapper.writer(csvMapper.schemaFor(BeaconExport.class).withHeader()).writeValueAsString(entries);
+	}
+
+	@Override
+	public long previewDelete(List<LocalDate> dates) {
+		return repository.countByDateIn(dates);
+	}
+
+	@Override
+	public long previewDelete(List<LocalDate> dates, String machine) {
+		return repository.countByDateInAndMachine(dates, machine);
+	}
+
+	@Transactional
+	@Override
+	public void delete(List<LocalDate> dates) {
+		repository.deleteAllByDateIn(dates);
+	}
+
+	@Transactional
+	@Override
+	public void delete(List<LocalDate> dates, String machine) {
+		repository.deleteAllByDateInAndMachine(dates, machine);
 	}
 	
 }

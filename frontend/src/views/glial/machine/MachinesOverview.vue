@@ -1,14 +1,11 @@
 <template>
 	<v-container fluid>
 		<v-row>
-			<v-col sm="4" cols="12">
-				<produced-objective-percent-card :entries="entries" :loading="loading" />
+			<v-col cols="6">
+				<download-card :machine="null" :loading="loading" />
 			</v-col>
-			<v-col sm="4" cols="6">
-				<download-card :machine="machine" :loading="loading" />
-			</v-col>
-			<v-col sm="4" cols="6">
-				<delete-card :machine="machine" :availableDates="dates" :loading="loading" @deleted="refresh" />
+			<v-col cols="6">
+				<delete-card :machine="null" :availableDates="dates" :loading="loading" @deleted="refresh" />
 			</v-col>
 			<v-col cols="12">
 				<v-card :loading="loading">
@@ -28,18 +25,7 @@
 						</v-btn>
 					</v-card-title>
 					<v-divider />
-					<template v-if="entries.length">
-						<v-row>
-							<v-col sm="8" cols="12">
-								<stopped-seconds-by-color-graph :entries="entries" />
-							</v-col>
-							<v-col sm="4" cols="12">
-								<stopped-seconds-by-color-pie :entries="entries" />
-							</v-col>
-						</v-row>
-						<v-divider />
-						<produced-objective-graph :entries="entries" />
-					</template>
+					<stopped-seconds-by-color-pie v-if="entries.length" :entries="entries" />
 					<empty v-else />
 				</v-card>
 			</v-col>
@@ -74,11 +60,6 @@ export default {
 		date: null,
 		modal: false,
 	}),
-	computed: {
-		machine() {
-			return this.$route.params.name || "";
-		},
-	},
 	watch: {
 		date(val, old) {
 			this.refresh();
@@ -97,7 +78,7 @@ export default {
 			this.loading = true;
 
 			this.$http
-				.get(`/glial/dates/${this.machine}`)
+				.get(`/glial/dates/`)
 				.then((response) => {
 					this.dates = response.data.payload;
 
@@ -111,7 +92,7 @@ export default {
 				})
 				.then(() =>
 					this.$http
-						.get(`/glial/entries/${this.machine}`, {
+						.get(`/glial/entries/`, {
 							params: {
 								date: this.date,
 							},

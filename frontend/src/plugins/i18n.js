@@ -26,6 +26,8 @@ let messages = {
 		},
 		common: {
 			edit: "EDIT",
+			confirm: "CONFIRM",
+			delete: "DELETE",
 			refresh: "REFRESH",
 			update: "UPDATE",
 			cancel: "CANCEL",
@@ -38,7 +40,9 @@ let messages = {
 				name: "Name",
 				category: "Category",
 				children: "Children",
-			}
+			},
+			"select-all": "SELECT ALL",
+			"unselect-all": "UNSELECT ALL",
 		},
 		socket: {
 			state: {
@@ -122,6 +126,11 @@ let messages = {
 				tooltips: {
 					seconds: "second | second | seconds",
 					times: "time | time | times",
+				},
+				confirmDelete: {
+					title: "Confirm",
+					phrase: "This operation will delete",
+					entries: "no entry | 1 entry | {n} entries"
 				}
 			},
 		},
@@ -154,6 +163,8 @@ let messages = {
 		common: {
 			edit: "ÉDITER",
 			refresh: "RAFRAICHIR",
+			confirm: "CONFIRMER",
+			delete: "SUPPRIMER",
 			update: "METTRE À JOUR",
 			cancel: "ANNULER",
 			close: "FERMER",
@@ -165,7 +176,9 @@ let messages = {
 				name: "Nom",
 				category: "Catégorie",
 				children: "Enfants",
-			}
+			},
+			"select-all": "SELECTIONER TOUT",
+			"unselect-all": "DÉSELECTIONER TOUT",
 		},
 		socket: {
 			state: {
@@ -249,6 +262,11 @@ let messages = {
 				tooltips: {
 					seconds: "seconde | seconde | secondes",
 					times: "fois | fois | fois",
+				},
+				confirmDelete: {
+					title: "Confirmation",
+					phrase: "Cette opération va supprimer",
+					entries: "aucune entrée | 1 entrée | {n} entrées"
 				}
 			},
 		},
