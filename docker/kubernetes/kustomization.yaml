@@ -1,0 +1,8 @@
+secretGenerator:
+- name: mysql-passwords
+  literals:
+  - root=password
+resources:
+  - mysql.yaml
+  - metallb.yaml
+  - jeldwen.yaml

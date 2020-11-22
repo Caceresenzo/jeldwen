@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jeldwen
+  labels:
+    app: jeldwen
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: jeldwen
+  template:
+    metadata:
+      labels:
+        app: jeldwen
+    spec:
+      containers:
+      - name: jeldwen
+        image: jeldwen
+        imagePullPolicy: Never
+        env:
+          - name: DATABASE_NAME
+            value: jeldwen
+          - name: DATABASE_HOST
+            value: mysql
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-passwords
+                key: root
+        ports:
+        - containerPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: jeldwen
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared-ip
+  labels:
+    app: jeldwen
+spec:
+  ports:
+    - name: jeldwen-http
+      port: 80
+    - name: jeldwen-websocket-5600
+      port: 5600
+    - name: jeldwen-websocket-5700
+      port: 5700
+  selector:
+    app: jeldwen
+  type: LoadBalancer
