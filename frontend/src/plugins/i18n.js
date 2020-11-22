@@ -9,6 +9,11 @@ let messages = {
 	en: {
 		name: "English",
 		version: `JELDWEN v${application.version}`,
+		copyright: {
+			by: "Created by",
+			for: "for",
+			"source-code": "source code"
+		},
 		route: {
 			home: "Home",
 			beacons: {
@@ -169,6 +174,11 @@ let messages = {
 	fr: {
 		name: "Français",
 		version: `JELDWEN v${application.version}`,
+		copyright: {
+			by: "Crée par",
+			for: "pour",
+			"source-code": "code source"
+		},
 		route: {
 			home: "Home",
 			beacons: {

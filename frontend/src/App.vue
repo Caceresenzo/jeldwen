@@ -46,7 +46,13 @@
 		</v-main>
 
 		<v-footer app>
-			<span>&copy; {{ new Date().getFullYear() }}</span>
+			<v-spacer />
+			<span>&copy; 2020-{{ new Date().getFullYear() }}
+				--
+				{{ $t('copyright.by') }} <a href="https://github.com/Caceresenzo" target="_blank">Enzo CACERES</a>
+				{{ $t('copyright.for') }} <a href="https://www.jeld-wen.com/" target="_blank">JELD-WEN</a>
+				(<a href="https://github.com/Caceresenzo/jeldwen" target="_blank">{{ $t('copyright.source-code') }}</a>)
+			</span>
 		</v-footer>
 	</v-app>
 </template>
