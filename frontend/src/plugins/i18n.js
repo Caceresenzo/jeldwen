@@ -16,8 +16,9 @@ let messages = {
 				editor: "Editor"
 			},
 			"glial-machines": {
-				_: "MACHINES GLIAL",
+				_: "GLIAL MACHINES",
 				overview: "Overview",
+				settings: "Settings",
 			},
 			others: {
 				_: "OTHERS",
@@ -131,6 +132,29 @@ let messages = {
 					title: "Confirm",
 					phrase: "This operation will delete",
 					entries: "no entry | 1 entry | {n} entries"
+				},
+				settings: {
+					urls: {
+						_: "URLs",
+						hint: "e.g.: http://mybeacon.jeld-wen.com or http://1.2.3.4",
+						dialogs: {
+							create: {
+								_: "New Entry"
+							},
+							delete: {
+								text: "Do you want to delete this entry?"
+							}
+						},
+						columns: {
+							machines: "Machines",
+							urls: "URLs",
+							actions: "Actions"
+						},
+						fields: {
+							url: "URL",
+							machine: "Machine",
+						}
+					}
 				}
 			},
 		},
@@ -154,6 +178,7 @@ let messages = {
 			"glial-machines": {
 				_: "MACHINES GLIAL",
 				overview: "Vu d'ensemble",
+				settings: "Paramètres",
 			},
 			others: {
 				_: "AUTRES",
@@ -267,6 +292,29 @@ let messages = {
 					title: "Confirmation",
 					phrase: "Cette opération va supprimer",
 					entries: "aucune entrée | 1 entrée | {n} entrées"
+				},
+				settings: {
+					urls: {
+						_: "Liens",
+						hint: "exemple: http://mabalise.jeld-wen.com ou http://1.2.3.4",
+						dialogs: {
+							create: {
+								_: "Nouvelle Entrée"
+							},
+							delete: {
+								text: "Voulez vous supprimer cette entrée ?"
+							}
+						},
+						columns: {
+							machines: "Machines",
+							urls: "Liens",
+							actions: "Actions"
+						},
+						fields: {
+							url: "Lien",
+							machine: "Machine",
+						}
+					}
 				}
 			},
 		},

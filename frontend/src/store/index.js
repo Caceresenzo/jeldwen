@@ -37,7 +37,7 @@ export default new Vuex.Store({
 
 							commit('setLoading', true);
 
-							http.get("/glial/machines")
+							http.get("/glial/beacon-urls/machines")
 								.then((response) => {
 									commit('setMachines', response.data.payload);
 									commit('setError', null);

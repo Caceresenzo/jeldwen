@@ -24,13 +24,19 @@
 					<v-list-item-title>{{ $t("route.glial-machines.overview") }}</v-list-item-title>
 				</v-list-item-content>
 			</v-list-item>
-			<v-list-item v-for="machine in machines" :key="machine" link :to="`/glial/machine/${machine}`">
+			<v-list-item v-for="machine in machines" :key="machine.machine" link :to="`/glial/machine/${machine.machine}`">
+				<!-- TODO: Change for better variable names, use beacon instead of machine? -->
 				<v-list-item-action>
 					<v-icon>mdi-washing-machine</v-icon>
 				</v-list-item-action>
-				<v-list-item-content>
-					<v-list-item-title>{{ machine }}</v-list-item-title>
-				</v-list-item-content>
+				<v-list-item-title>
+					{{ machine.machine }}
+				</v-list-item-title>
+				<v-list-item-icon v-if="machine.url">
+					<v-btn icon @click="openExternal(machine.url)">
+						<v-icon>mdi-open-in-new</v-icon>
+					</v-btn>
+				</v-list-item-icon>
 			</v-list-item>
 		</template>
 		<v-list-item v-else-if="!error">
@@ -39,6 +45,14 @@
 			</v-list-item-action>
 			<v-list-item-content>
 				<v-list-item-title>No machine</v-list-item-title>
+			</v-list-item-content>
+		</v-list-item>
+		<v-list-item link :to="`/glial/settings`">
+			<v-list-item-action>
+				<v-icon>mdi-cog</v-icon>
+			</v-list-item-action>
+			<v-list-item-content>
+				<v-list-item-title>{{ $t("route.glial-machines.settings") }}</v-list-item-title>
 			</v-list-item-content>
 		</v-list-item>
 	</div>
@@ -61,6 +75,10 @@ export default {
 	methods: {
 		refresh() {
 			return this.$store.dispatch("glial/machine/fetch");
+		},
+		openExternal(url) {
+			var win = window.open(url, "_blank");
+			win.focus();
 		},
 	},
 };

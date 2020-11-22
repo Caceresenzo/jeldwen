@@ -36,8 +36,13 @@ const routes = [
 		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachinesOverview.vue')
 	},
 	{
+		path: '/glial/settings',
+		name: 'Glial Machine Settings',
+		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachineSettings.vue')
+	},
+	{
 		path: '/glial/machine/:name',
-		name: 'Glial Machine Details',
+		name: 'Glial Machines Details',
 		component: () => import(/* webpackChunkName: "machine" */ '../views/glial/machine/MachineDetails.vue')
 	},
 	{
