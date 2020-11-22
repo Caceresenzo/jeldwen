@@ -3,12 +3,8 @@
 		<v-row>
 			<v-col>
 				<v-card>
-					<v-card-text>Hello</v-card-text>
-					<v-card-actions>
-						<v-spacer></v-spacer>
-						<v-btn text>Cancel</v-btn>
-						<v-btn text color="primary">Submit</v-btn>
-					</v-card-actions>
+					<v-card-title>{{ $t('home.welcome') }}</v-card-title>
+					<v-card-text>{{ $t('home.no-purpose') }}</v-card-text>
 				</v-card>
 			</v-col>
 		</v-row>

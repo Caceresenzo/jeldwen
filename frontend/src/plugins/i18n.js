@@ -14,6 +14,7 @@ let messages = {
 			for: "for",
 			"source-code": "source code"
 		},
+		abandoned: "This project has been abandoned",
 		route: {
 			home: "Home",
 			beacons: {
@@ -49,6 +50,10 @@ let messages = {
 			},
 			"select-all": "SELECT ALL",
 			"unselect-all": "UNSELECT ALL",
+		},
+		home: {
+			welcome: "Welcome on the JELD-WEN dashboard",
+			"no-purpose": "This page is currently serving no purpose."
 		},
 		socket: {
 			state: {
@@ -179,6 +184,7 @@ let messages = {
 			for: "pour",
 			"source-code": "code source"
 		},
+		abandoned: "Ce projet à été abandonné",
 		route: {
 			home: "Home",
 			beacons: {
@@ -214,6 +220,10 @@ let messages = {
 			},
 			"select-all": "SELECTIONER TOUT",
 			"unselect-all": "DÉSELECTIONER TOUT",
+		},
+		home: {
+			welcome: "Bienvenue sur le tableau de bord JELD-WEN",
+			"no-purpose": "Cette page ne sert actuellement à rien."
 		},
 		socket: {
 			state: {

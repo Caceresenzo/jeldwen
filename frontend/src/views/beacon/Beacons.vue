@@ -2,6 +2,7 @@
 	<v-container fluid>
 		<v-row>
 			<v-col cols="12">
+				<v-alert type="warning">{{ $t("abandoned") }}</v-alert>
 				<list-card title="Availables" endpoint="/beacon" :linkFormatter="(item) => '/beacon/' + item.id">
 					<template v-slot="{ item }">
 						<v-list-item-avatar>
